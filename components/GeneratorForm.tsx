@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Module, FormData } from '../types';
-import { KELAS_OPTIONS, MATA_PELAJARAN_OPTIONS, ALOKASI_WAKTU_OPTIONS } from '../constants';
+import { Module, FormData, SoalPesantrenSection } from '../types';
+import { KELAS_OPTIONS, MATA_PELAJARAN_OPTIONS, ALOKASI_WAKTU_OPTIONS, PESANTREN_SOAL_LETTERS, ARABIC_SUBJECTS } from '../constants';
 import Spinner from './Spinner';
 
 interface GeneratorFormProps {
@@ -20,11 +20,11 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
       tahun_ajaran: '2025-2026', nama_guru: '', fase: '',
       cp_elements: '', alokasi_waktu: '', jumlah_modul_ajar: 1,
       topik_materi: '', sertakan_kisi_kisi: true, sertakan_soal_tka: false,
-      jumlah_soal_tka: 5, kelompok_tka: 'saintek', jumlah_soal_total: 20,
+      jumlah_soal_tka: 5, sertakan_soal_tka_uraian: false, jumlah_soal_tka_uraian: 3,
+      kelompok_tka: 'saintek', jumlah_soal_total: 20,
       jenis_soal: ['Pilihan Ganda', 'Uraian'], jumlah_pg: 15, jumlah_uraian: 5,
       jumlah_isian_singkat: 0, 
-      jenis_soal_pesantren: ['Alif', 'Ba'], jumlah_soal_alif: 10, jumlah_soal_ba: 5,
-      jumlah_soal_jim: 5, jumlah_soal_dal: 5, jumlah_soal_ha: 1,
+      soal_pesantren_sections: [],
       tingkat_kesulitan: 'Sedang', bahasa: 'Bahasa Indonesia',
       yayasan: 'YAYASAN PENDIDIKAN ISLAM PONDOK MODERN AL-GHOZALI',
       alamat_sekolah: 'Jl. Permata No. 19 Curug Gunungsindur Kab. Bogor 16340',
@@ -32,6 +32,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
       judul_asesmen: 'PENILAIAN SUMATIF AKHIR SEMESTER GANJIL',
       tanggal_ujian: '',
       jam_ke: '', waktu_ujian: '90 Menit', use_thinking_mode: false,
+      topik_ecourse: '', jumlah_pertemuan: 5,
     };
     try {
         const savedData = localStorage.getItem('guruAppData');
@@ -96,12 +97,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     if (module === 'soal') {
       let total = 0;
       if (formData.jenjang === 'Pesantren') {
-        const alifCount = formData.jenis_soal_pesantren?.includes('Alif') ? (Number(formData.jumlah_soal_alif) || 0) : 0;
-        const baCount = formData.jenis_soal_pesantren?.includes('Ba') ? (Number(formData.jumlah_soal_ba) || 0) : 0;
-        const jimCount = formData.jenis_soal_pesantren?.includes('Jim') ? (Number(formData.jumlah_soal_jim) || 0) : 0;
-        const dalCount = formData.jenis_soal_pesantren?.includes('Dal') ? (Number(formData.jumlah_soal_dal) || 0) : 0;
-        const haCount = formData.mata_pelajaran.toUpperCase() === 'INSYA' && formData.jenis_soal_pesantren?.includes('Ha') ? (Number(formData.jumlah_soal_ha) || 0) : 0;
-        total = alifCount + baCount + jimCount + dalCount + haCount;
+        total = (formData.soal_pesantren_sections || []).reduce((sum, section) => sum + (Number(section.count) || 0), 0);
       } else {
         const pgCount = formData.jenis_soal?.includes('Pilihan Ganda') ? (Number(formData.jumlah_pg) || 0) : 0;
         const uraianCount = formData.jenis_soal?.includes('Uraian') ? (Number(formData.jumlah_uraian) || 0) : 0;
@@ -120,8 +116,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
   }, [
     formData.jumlah_pg, formData.jumlah_uraian, formData.jumlah_isian_singkat,
     formData.jumlah_soal_total, formData.jenis_soal, module, formData.jenjang,
-    formData.jenis_soal_pesantren, formData.jumlah_soal_alif, formData.jumlah_soal_ba,
-    formData.jumlah_soal_jim, formData.jumlah_soal_dal, formData.jumlah_soal_ha, formData.mata_pelajaran
+    formData.soal_pesantren_sections
   ]);
 
   const [kelasOptions, setKelasOptions] = useState<string[]>([]);
@@ -157,13 +152,36 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     });
   };
 
-  const handleCheckboxChangePesantren = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData(prev => {
-      const newJenisSoal = checked ? [...(prev.jenis_soal_pesantren || []), name] : (prev.jenis_soal_pesantren || []).filter(item => item !== name);
-      return { ...prev, jenis_soal_pesantren: newJenisSoal };
-    });
+  // --- NEW DYNAMIC PESANTREN SECTION HANDLERS ---
+  const addPesantrenSection = () => {
+    const newSection: SoalPesantrenSection = {
+        id: `section_${Date.now()}`,
+        letter: 'Alif',
+        instruction: '',
+        count: 5,
+    };
+    setFormData(prev => ({
+        ...prev,
+        soal_pesantren_sections: [...(prev.soal_pesantren_sections || []), newSection]
+    }));
   };
+
+  const removePesantrenSection = (id: string) => {
+    setFormData(prev => ({
+        ...prev,
+        soal_pesantren_sections: (prev.soal_pesantren_sections || []).filter(s => s.id !== id)
+    }));
+  };
+  
+  const handlePesantrenSectionChange = (id: string, field: keyof SoalPesantrenSection, value: string | number) => {
+      setFormData(prev => ({
+          ...prev,
+          soal_pesantren_sections: (prev.soal_pesantren_sections || []).map(s => 
+              s.id === id ? { ...s, [field]: value } : s
+          )
+      }));
+  };
+  // --- END ---
   
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -184,9 +202,16 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     onSubmit(formData);
   };
 
-  const title = module === 'admin' ? 'Generator Administrasi Guru' : 'Generator Bank Soal';
-  const description = module === 'admin' ? 'Lengkapi form untuk menghasilkan ATP, Prota, Promes, Modul Ajar, KKTP, dan Jurnal Harian.' : 'Lengkapi form untuk menghasilkan bank soal dan perangkat asesmen adaptif.';
+  const title = module === 'admin' ? 'Generator Administrasi Guru' : module === 'soal' ? 'Generator Bank Soal' : 'Generator E-Course';
+  const description = module === 'admin' 
+    ? 'Lengkapi form untuk menghasilkan ATP, Prota, Promes, Modul Ajar, KKTP, dan Jurnal Harian.' 
+    : module === 'soal' 
+    ? 'Lengkapi form untuk menghasilkan bank soal dan perangkat asesmen adaptif.'
+    : 'Lengkapi form untuk menghasilkan silabus, materi, latihan, dan slide presentasi untuk e-course Anda.';
   const formElementClasses = "w-full rounded-md border-2 border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 ease-in-out";
+
+  const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase());
+  const showPesantrenDynamicForm = module === 'soal' && formData.jenjang === 'Pesantren' && isArabicContext;
 
   return (
     <div className="bg-white rounded-lg card-shadow p-6 fade-in">
@@ -217,6 +242,17 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
           <input type="text" id="nama_guru" name="nama_guru" value={formData.nama_guru} onChange={handleChange} required className={formElementClasses} placeholder="Nama Pengajar" />
         </div>
         <hr/>
+
+        {module === 'ecourse' && (
+            <div className="space-y-6">
+                <textarea id="topik_ecourse" name="topik_ecourse" value={formData.topik_ecourse ?? ''} onChange={handleChange} required rows={3} className={formElementClasses} placeholder="Masukkan topik utama e-course..."></textarea>
+                <div>
+                    <label htmlFor="jumlah_pertemuan" className="block text-sm font-medium text-gray-700 mb-1">Jumlah Pertemuan/Modul</label>
+                    <input type="number" id="jumlah_pertemuan" name="jumlah_pertemuan" value={formData.jumlah_pertemuan} onChange={handleChange} required min="1" max="20" className={formElementClasses} placeholder="Jumlah Pertemuan" />
+                </div>
+            </div>
+        )}
+
         {module === 'admin' && (
           <div className="space-y-6">
              <div className="grid md:grid-cols-3 gap-6">
@@ -229,7 +265,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
           </div>
         )}
         
-        {module === 'soal' && formData.jenjang !== 'Pesantren' && (
+        {module === 'soal' && !showPesantrenDynamicForm && (
            <div className="space-y-6">
                 <textarea id="topik_materi" name="topik_materi" value={formData.topik_materi ?? ''} onChange={handleChange} required rows={3} className={formElementClasses} placeholder="Topik / Materi..."></textarea>
                 <button type="button" onClick={() => onShowAIAssistant(formData, 'topic')} className="text-sm text-blue-600 font-semibold hover:underline">✨ Dapatkan saran dari AI Asisten</button>
@@ -241,40 +277,95 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                     {formData.jenis_soal?.includes('Isian Singkat') && <input type="number" name="jumlah_isian_singkat" value={formData.jumlah_isian_singkat} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Isian" />}
                 </div>
                  {totalSoalError && <p className="text-sm text-red-600">{totalSoalError}</p>}
-                {['SMA', 'MA'].includes(formData.jenjang) && <div className="p-4 bg-indigo-50 border rounded-lg"><label><input type="checkbox" name="sertakan_soal_tka" checked={formData.sertakan_soal_tka} onChange={handleChange}/> Tambah soal TKA-UTBK</label>{formData.sertakan_soal_tka && <div className="grid md:grid-cols-2 gap-6 mt-2"><input type="number" name="jumlah_soal_tka" value={formData.jumlah_soal_tka} onChange={handleChange} className={formElementClasses} min="1" max="10" /><select name="kelompok_tka" value={formData.kelompok_tka} onChange={handleChange} className={formElementClasses}><option value="saintek">SAINTEK</option><option value="soshum">SOSHUM</option></select></div>}</div>}
+                {['SMA', 'MA'].includes(formData.jenjang) && (
+                  <div className="p-4 bg-indigo-50 border rounded-lg space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:space-x-6">
+                        <label className="flex items-center space-x-2">
+                            <input type="checkbox" name="sertakan_soal_tka" checked={formData.sertakan_soal_tka} onChange={handleChange}/> 
+                            <span>Tambah soal TKA Pilihan Ganda</span>
+                        </label>
+                        <label className="flex items-center space-x-2 mt-2 sm:mt-0">
+                            <input type="checkbox" name="sertakan_soal_tka_uraian" checked={formData.sertakan_soal_tka_uraian} onChange={handleChange}/> 
+                            <span>Tambah soal TKA Uraian</span>
+                        </label>
+                    </div>
+                    
+                    {(formData.sertakan_soal_tka || formData.sertakan_soal_tka_uraian) && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
+                            {formData.sertakan_soal_tka && 
+                                <div>
+                                    <label htmlFor="jumlah_soal_tka" className="text-xs font-medium text-gray-600">Jumlah TKA PG</label>
+                                    <input type="number" id="jumlah_soal_tka" name="jumlah_soal_tka" value={formData.jumlah_soal_tka} onChange={handleChange} className={formElementClasses} min="1" max="10" />
+                                </div>
+                            }
+                            {formData.sertakan_soal_tka_uraian &&
+                                <div>
+                                    <label htmlFor="jumlah_soal_tka_uraian" className="text-xs font-medium text-gray-600">Jumlah TKA Uraian</label>
+                                    <input type="number" id="jumlah_soal_tka_uraian" name="jumlah_soal_tka_uraian" value={formData.jumlah_soal_tka_uraian} onChange={handleChange} className={formElementClasses} min="1" max="5" />
+                                </div>
+                            }
+                            <div>
+                                <label htmlFor="kelompok_tka" className="text-xs font-medium text-gray-600">Kelompok TKA</label>
+                                <select id="kelompok_tka" name="kelompok_tka" value={formData.kelompok_tka} onChange={handleChange} className={formElementClasses}>
+                                    <option value="saintek">SAINTEK</option>
+                                    <option value="soshum">SOSHUM</option>
+                                </select>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                )}
                 <div className="grid md:grid-cols-2 gap-6"><select name="tingkat_kesulitan" value={formData.tingkat_kesulitan} onChange={handleChange} className={formElementClasses}><option>Mudah</option><option>Sedang</option><option>Sulit (HOTS)</option></select><label><input type="checkbox" name="sertakan_kisi_kisi" checked={formData.sertakan_kisi_kisi} onChange={handleChange}/> Sertakan Kisi-kisi</label></div>
-                <hr/>
-                <h3 className="text-lg font-medium">Kustomisasi Header Soal</h3>
-                <input type="file" id="logo_sekolah" name="logo_sekolah" accept="image/*" onChange={handleLogoChange} className="text-sm" />
-                <div className="grid md:grid-cols-2 gap-6"><input type="text" name="yayasan" value={formData.yayasan} onChange={handleChange} className={formElementClasses} placeholder="Nama Yayasan"/><input type="text" name="alamat_sekolah" value={formData.alamat_sekolah} onChange={handleChange} className={formElementClasses} placeholder="Alamat Sekolah"/></div>
            </div>
         )}
 
-        {module === 'soal' && formData.jenjang === 'Pesantren' && (
+        {showPesantrenDynamicForm && (
             <div className="space-y-6">
-                <textarea id="topik_materi" name="topik_materi" value={formData.topik_materi ?? ''} onChange={handleChange} required rows={3} className={formElementClasses} placeholder="Topik / Materi..."></textarea>
+                <textarea id="topik_materi" name="topik_materi" value={formData.topik_materi ?? ''} onChange={handleChange} required rows={3} className={formElementClasses} placeholder="Topik / Materi (contoh: I'rab, Tashrif, Adad Ma'dud)..."></textarea>
                 <button type="button" onClick={() => onShowAIAssistant(formData, 'topic')} className="text-sm text-blue-600 font-semibold hover:underline">✨ Dapatkan saran dari AI Asisten</button>
-                <input type="number" id="jumlah_soal_total" name="jumlah_soal_total" value={formData.jumlah_soal_total} onChange={handleChange} className={formElementClasses} placeholder="Total Soal Standar"/>
+                <input type="number" id="jumlah_soal_total" name="jumlah_soal_total" value={formData.jumlah_soal_total} onChange={handleChange} className={formElementClasses} placeholder="Total Soal Standar (untuk validasi)"/>
                 
-                <div className="p-4 bg-gray-50 border rounded-lg">
-                    <h4 className="font-semibold mb-3">Pilih Jenis Soal Pesantren (Bukan Pilihan Ganda)</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <label className="flex items-center space-x-2"><input type="checkbox" name="Alif" checked={formData.jenis_soal_pesantren?.includes('Alif')} onChange={handleCheckboxChangePesantren}/> <span>Alif (Isian Singkat)</span></label>
-                        <label className="flex items-center space-x-2"><input type="checkbox" name="Ba" checked={formData.jenis_soal_pesantren?.includes('Ba')} onChange={handleCheckboxChangePesantren}/> <span>Ba (Menjawab Pertanyaan)</span></label>
-                        <label className="flex items-center space-x-2"><input type="checkbox" name="Jim" checked={formData.jenis_soal_pesantren?.includes('Jim')} onChange={handleCheckboxChangePesantren}/> <span>Jim (Membuat Kalimat)</span></label>
-                        <label className="flex items-center space-x-2"><input type="checkbox" name="Dal" checked={formData.jenis_soal_pesantren?.includes('Dal')} onChange={handleCheckboxChangePesantren}/> <span>Dal (Menerjemahkan)</span></label>
-                        {formData.mata_pelajaran.toUpperCase() === 'INSYA' && (
-                            <label className="flex items-center space-x-2"><input type="checkbox" name="Ha" checked={formData.jenis_soal_pesantren?.includes('Ha')} onChange={handleCheckboxChangePesantren}/> <span>Ha (Karangan Insya)</span></label>
-                        )}
-                    </div>
-                </div>
-                
-                <div className="grid md:grid-cols-3 gap-6">
-                    {formData.jenis_soal_pesantren?.includes('Alif') && <input type="number" name="jumlah_soal_alif" value={formData.jumlah_soal_alif} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Soal Alif" />}
-                    {formData.jenis_soal_pesantren?.includes('Ba') && <input type="number" name="jumlah_soal_ba" value={formData.jumlah_soal_ba} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Soal Ba" />}
-                    {formData.jenis_soal_pesantren?.includes('Jim') && <input type="number" name="jumlah_soal_jim" value={formData.jumlah_soal_jim} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Soal Jim" />}
-                    {formData.jenis_soal_pesantren?.includes('Dal') && <input type="number" name="jumlah_soal_dal" value={formData.jumlah_soal_dal} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Soal Dal" />}
-                    {formData.mata_pelajaran.toUpperCase() === 'INSYA' && formData.jenis_soal_pesantren?.includes('Ha') && <input type="number" name="jumlah_soal_ha" value={formData.jumlah_soal_ha} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Soal Ha" />}
+                <div className="p-4 bg-gray-50 border rounded-lg space-y-4">
+                  <h3 className="font-semibold text-gray-800">Pembangun Bagian Soal (Berbahasa Arab)</h3>
+                  {(formData.soal_pesantren_sections || []).map((section, index) => (
+                      <div key={section.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center p-2 border-b">
+                          <div className="md:col-span-2">
+                              <select 
+                                value={section.letter} 
+                                onChange={(e) => handlePesantrenSectionChange(section.id, 'letter', e.target.value)}
+                                className={formElementClasses}
+                              >
+                                {PESANTREN_SOAL_LETTERS.map(l => <option key={l} value={l}>{l}</option>)}
+                              </select>
+                          </div>
+                          <div className="md:col-span-6">
+                               <input 
+                                type="text" 
+                                value={section.instruction}
+                                placeholder="اكتب الأمر هنا... (Contoh: أجب عن الأسئلة الآتية)"
+                                onChange={(e) => handlePesantrenSectionChange(section.id, 'instruction', e.target.value)}
+                                className={`${formElementClasses} arabic-font-preview`}
+                                style={{textAlign: 'right'}}
+                                required
+                               />
+                          </div>
+                          <div className="md:col-span-2">
+                              <input 
+                                type="number"
+                                value={section.count}
+                                min="1"
+                                placeholder="Jumlah Soal"
+                                onChange={(e) => handlePesantrenSectionChange(section.id, 'count', parseInt(e.target.value, 10))}
+                                className={formElementClasses}
+                                required
+                              />
+                          </div>
+                          <div className="md:col-span-2 flex justify-end">
+                              <button type="button" onClick={() => removePesantrenSection(section.id)} className="text-red-500 hover:text-red-700 font-semibold">Hapus</button>
+                          </div>
+                      </div>
+                  ))}
+                  <button type="button" onClick={addPesantrenSection} className="w-full mt-2 px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-md hover:bg-blue-200">+ Tambah Bagian Soal</button>
                 </div>
 
                 {totalSoalError && <p className="text-sm text-red-600">{totalSoalError}</p>}
@@ -283,13 +374,18 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                     <select name="tingkat_kesulitan" value={formData.tingkat_kesulitan} onChange={handleChange} className={formElementClasses}><option>Mudah</option><option>Sedang</option><option>Sulit (HOTS)</option></select>
                     <label><input type="checkbox" name="sertakan_kisi_kisi" checked={formData.sertakan_kisi_kisi} onChange={handleChange}/> Sertakan Kisi-kisi</label>
                 </div>
-                <hr/>
-                <h3 className="text-lg font-medium">Kustomisasi Header Soal</h3>
-                <input type="file" id="logo_sekolah" name="logo_sekolah" accept="image/*" onChange={handleLogoChange} className="text-sm" />
-                <div className="grid md:grid-cols-2 gap-6"><input type="text" name="yayasan" value={formData.yayasan} onChange={handleChange} className={formElementClasses} placeholder="Nama Yayasan"/><input type="text" name="alamat_sekolah" value={formData.alamat_sekolah} onChange={handleChange} className={formElementClasses} placeholder="Alamat Sekolah"/></div>
            </div>
         )}
         
+        {module === 'soal' && (
+            <>
+            <hr/>
+            <h3 className="text-lg font-medium">Kustomisasi Header Soal</h3>
+            <input type="file" id="logo_sekolah" name="logo_sekolah" accept="image/*" onChange={handleLogoChange} className="text-sm" />
+            <div className="grid md:grid-cols-2 gap-6"><input type="text" name="yayasan" value={formData.yayasan} onChange={handleChange} className={formElementClasses} placeholder="Nama Yayasan"/><input type="text" name="alamat_sekolah" value={formData.alamat_sekolah} onChange={handleChange} className={formElementClasses} placeholder="Alamat Sekolah"/></div>
+            </>
+        )}
+
         <div className="p-4 bg-gray-100 rounded-lg flex items-center justify-between">
             <div className="form-control">
                 <label className="cursor-pointer label">

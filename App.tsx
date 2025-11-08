@@ -20,7 +20,7 @@ import FeedbackForm from './components/FeedbackForm';
 import OnboardingTour from './components/OnboardingTour';
 import AdminPanel from './components/AdminPanel';
 import { View, Module, FormData, HistoryItem, NotificationType, GeneratedSection, ActivityLogItem, FeedbackItem, ShareableLink } from './types';
-import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections } from './services/geminiService';
+import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections, generateEcourseContent } from './services/geminiService';
 
 const ADMIN_USER = "Admin Guru";
 
@@ -182,7 +182,7 @@ const App: React.FC = () => {
   };
 
   const handleModuleSelect = (module: Module | View) => {
-     if (module === 'admin' || module === 'soal') {
+     if (module === 'admin' || module === 'soal' || module === 'ecourse') {
         setCurrentModule(module);
         setView('form');
         setGeneratedSections([]);
@@ -213,11 +213,15 @@ const App: React.FC = () => {
   
   const addActivityLog = (formData: FormData, module: Module) => {
     if (!currentUser) return;
+    const details = module === 'ecourse' 
+      ? `${formData.topik_ecourse} - ${formData.jumlah_pertemuan} Pertemuan`
+      : `${formData.mata_pelajaran} - Kelas ${formData.kelas}`;
+
     const newLog: ActivityLogItem = {
       id: Date.now().toString(),
       user: currentUser,
       module_type: module,
-      details: `${formData.mata_pelajaran} - Kelas ${formData.kelas}`,
+      details: details,
       created_at: new Date().toISOString(),
     };
     setActivityLog(prev => [newLog, ...prev]);
@@ -256,8 +260,10 @@ const App: React.FC = () => {
       let sections: GeneratedSection[] = [];
       if (currentModule === 'admin') {
         sections = await generateAdminContent(formData);
-      } else {
+      } else if (currentModule === 'soal') {
         sections = await generateSoalContentSections(formData);
+      } else if (currentModule === 'ecourse') {
+        sections = await generateEcourseContent(formData);
       }
       
       clearProgressInterval();

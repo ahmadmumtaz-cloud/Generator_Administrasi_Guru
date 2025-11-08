@@ -1,11 +1,18 @@
-export type View = 'dashboard' | 'form' | 'results' | 'audioLab' | 'groundedSearch' | 'imageLab' | 'videoLab' | 'adminPanel';
-export type Module = 'admin' | 'soal';
+export type View = 'dashboard' | 'form' | 'results' | 'audioLab' | 'groundedSearch' | 'imageLab' | 'videoLab' | 'adminPanel' | 'ecourse';
+export type Module = 'admin' | 'soal' | 'ecourse';
 export type NotificationType = 'success' | 'error' | 'warning';
 
 export interface GeneratedSection {
   id: string;
   title: string;
   content: string;
+}
+
+export interface SoalPesantrenSection {
+  id: string;
+  letter: string;
+  instruction: string;
+  count: number;
 }
 
 export interface FormData {
@@ -25,9 +32,15 @@ export interface FormData {
   alokasi_waktu?: string;
   jumlah_modul_ajar?: number;
 
+  // E-Course module specific
+  topik_ecourse?: string;
+  jumlah_pertemuan?: number;
+
   // Soal module specific
   sertakan_soal_tka?: boolean;
   jumlah_soal_tka?: number;
+  sertakan_soal_tka_uraian?: boolean;
+  jumlah_soal_tka_uraian?: number;
   kelompok_tka?: 'saintek' | 'soshum';
   sertakan_kisi_kisi?: boolean;
   topik_materi?: string;
@@ -39,13 +52,8 @@ export interface FormData {
   tingkat_kesulitan?: string;
   bahasa?: string;
 
-  // Pesantren-specific soal fields
-  jenis_soal_pesantren?: string[];
-  jumlah_soal_alif?: number;
-  jumlah_soal_ba?: number;
-  jumlah_soal_jim?: number;
-  jumlah_soal_dal?: number;
-  jumlah_soal_ha?: number;
+  // Pesantren-specific soal fields (NEW DYNAMIC STRUCTURE)
+  soal_pesantren_sections?: SoalPesantrenSection[];
   
   // Soal module header customization
   yayasan?: string;
@@ -74,7 +82,7 @@ export interface GroundingSource {
 }
 
 export interface ActivityLogItem {
-  id: string;
+  id:string;
   user: string;
   module_type: Module;
   details: string;

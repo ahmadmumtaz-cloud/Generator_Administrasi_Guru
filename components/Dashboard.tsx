@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Module, View } from '../types';
 
@@ -31,6 +30,17 @@ const modules = [
     color: 'green',
   },
   {
+    id: 'ecourse',
+    title: 'Generator E-Course',
+    description: 'Silabus, materi, latihan, evaluasi, & slide presentasi.',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10.394 2.08a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+      </svg>
+    ),
+    color: 'yellow',
+  },
+  {
     id: 'audioLab',
     title: 'Lab Audio & Percakapan',
     description: 'Percakapan real-time dengan AI & transkripsi audio.',
@@ -46,7 +56,7 @@ const modules = [
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" /></svg>
     ),
-    color: 'yellow',
+    color: 'pink',
   },
   {
     id: 'imageLab',
@@ -123,8 +133,9 @@ const modules = [
 const colorClasses = {
     blue: { bg: 'bg-blue-500', border: 'border-blue-200', hoverBg: 'hover:bg-blue-50', hoverBorder: 'hover:border-blue-500' },
     green: { bg: 'bg-green-500', border: 'border-green-200', hoverBg: 'hover:bg-green-50', hoverBorder: 'hover:border-green-500' },
-    teal: { bg: 'bg-teal-500', border: 'border-teal-200', hoverBg: 'hover:bg-teal-50', hoverBorder: 'hover:border-teal-500' },
     yellow: { bg: 'bg-yellow-500', border: 'border-yellow-200', hoverBg: 'hover:bg-yellow-50', hoverBorder: 'hover:border-yellow-500' },
+    teal: { bg: 'bg-teal-500', border: 'border-teal-200', hoverBg: 'hover:bg-teal-50', hoverBorder: 'hover:border-teal-500' },
+    pink: { bg: 'bg-pink-500', border: 'border-pink-200', hoverBg: 'hover:bg-pink-50', hoverBorder: 'hover:border-pink-500' },
     purple: { bg: 'bg-purple-500', border: 'border-purple-200', hoverBg: 'hover:bg-purple-50', hoverBorder: 'hover:border-purple-500' },
     red: { bg: 'bg-red-500', border: 'border-red-200', hoverBg: 'hover:bg-red-50', hoverBorder: 'hover:border-red-500' },
     orange: { bg: 'bg-orange-500', border: 'border-orange-200', hoverBg: 'hover:bg-orange-50', hoverBorder: 'hover:border-orange-500' },

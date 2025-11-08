@@ -78,3 +78,5 @@ export const ALOKASI_WAKTU_OPTIONS: Record<string, string[]> = {
     'MA': ['2 JP/minggu (90 menit/minggu)', '3 JP/minggu (135 menit/minggu)', '4 JP/minggu (180 menit/minggu)'],
     'Pesantren': ['2 JP/minggu (90 menit/minggu)', '3 JP/minggu (135 menit/minggu)', '4 JP/minggu (180 menit/minggu)', '5 JP/minggu (225 menit/minggu)']
 };
+
+export const PESANTREN_SOAL_LETTERS = ['Alif', 'Ba', 'Jim', 'Dal', 'Ha', 'Waw', 'Zay'];
