@@ -1,0 +1,21 @@
+def buat_netlify_toml(publish_folder, build_command, env_vars: dict):
+    isi = '[build]\n'
+    isi += f'  publish = "{publish_folder}"\n'
+    isi += f'  command = "{build_command}"\n'
+    if env_vars:
+        isi += '\n[build.environment]\n'
+        for key, value in env_vars.items():
+            isi += f'  {key} = "{value}"\n'
+    
+    with open('netlify.toml', 'w') as f:
+        f.write(isi)
+    return f'netlify.toml berhasil dibuat dengan isi sebagai berikut:\n{isi}'
+
+# Contoh pemakaian fungsi:
+publish = 'dist'
+build = 'npm run build'
+environment = {
+    'GEMINI_API_KEY': 'your_api_key_here'  # ganti dengan API key asli
+}
+
+print(buat_netlify_toml(publish, build, environment))
