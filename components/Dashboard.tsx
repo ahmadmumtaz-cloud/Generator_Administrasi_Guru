@@ -84,11 +84,6 @@ const modules = [
     id: 'ebook',
     title: 'Perpustakaan Digital',
     description: 'Akses ribuan buku digital resmi dari Kemendikbud.',
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" />
-      </svg>
-    ),
     color: 'orange',
     url: 'https://buku.kemendikdasmen.go.id/',
   },
@@ -96,11 +91,6 @@ const modules = [
     id: 'quran',
     title: "Al-Qur'an Digital",
     description: "Akses Al-Qur'an digital lengkap dari Kemenag.",
-    icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" />
-        </svg>
-    ),
     color: 'indigo',
     url: 'https://quran.kemenag.go.id/',
   },
@@ -108,11 +98,6 @@ const modules = [
     id: 'hadits',
     title: "Hadits Digital",
     description: "Akses koleksi hadits lengkap dari Hadits.id.",
-    icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" />
-        </svg>
-    ),
     color: 'cyan',
     url: 'https://www.hadits.id/',
   },
@@ -120,11 +105,6 @@ const modules = [
     id: 'perpusnas',
     title: 'Perpustakaan Nasional',
     description: 'Jelajahi koleksi buku baru dari Perpusnas RI.',
-    icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
-        </svg>
-    ),
     color: 'gray',
     url: 'https://www.perpusnas.go.id/buku-baru',
   }
@@ -144,13 +124,30 @@ const colorClasses = {
     gray: { bg: 'bg-gray-500', border: 'border-gray-200', hoverBg: 'hover:bg-gray-50', hoverBorder: 'hover:border-gray-500' }
 }
 
+const BookmarkIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+    </svg>
+);
+
+const ExternalLinkIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+      <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+      <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+    </svg>
+);
+
+
 const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, isAdmin }) => {
-  const allowedUserModules = ['admin', 'soal', 'ebook'];
-  const visibleModules = isAdmin ? modules : modules.filter(mod => allowedUserModules.includes(mod.id));
+  const generatorModules = modules.filter(m => !('url' in m));
+  const externalLinks = modules.filter(m => 'url' in m);
+  
+  const allowedUserModules = ['admin', 'soal'];
+  const visibleGeneratorModules = isAdmin ? generatorModules : generatorModules.filter(mod => allowedUserModules.includes(mod.id));
   
   const gridLayoutClass = isAdmin
     ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
-    : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+    : "grid-cols-1 md:grid-cols-2";
 
   return (
     <div className="fade-in">
@@ -161,40 +158,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, isAdmin }) => {
           {isAdmin ? "Pilih salah satu alat canggih di bawah ini untuk memulai." : "Silakan pilih modul yang tersedia untuk memulai."}
         </p>
       </div>
+
+      {/* --- Main Generator Modules --- */}
       <div className={`grid ${gridLayoutClass} gap-6`}>
-        {visibleModules.map((mod) => {
+        {visibleGeneratorModules.map((mod) => {
           const colors = colorClasses[mod.color as keyof typeof colorClasses];
-          const isExternal = 'url' in mod && mod.url;
-          
           const commonClasses = `module-btn p-6 border-2 ${colors.border} rounded-lg ${colors.hoverBorder} ${colors.hoverBg} transition-all duration-200 text-left flex flex-col items-start card-shadow`;
           
-          const content = (
-            <>
-              <div className="flex items-center mb-3 w-full">
-                <div className={`w-16 h-16 ${colors.bg} rounded-lg flex items-center justify-center mr-4 flex-shrink-0`}>
-                  {mod.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">{mod.title}</h3>
-              </div>
-              <p className="text-gray-600">{mod.description}</p>
-            </>
-          );
-
-          if (isExternal) {
-            return (
-              <a
-                href={mod.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                id={`tour-step-${mod.id}`}
-                key={mod.id}
-                className={commonClasses}
-              >
-                {content}
-              </a>
-            )
-          }
-
           return (
             <button
               id={`tour-step-${mod.id}`}
@@ -202,7 +172,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, isAdmin }) => {
               onClick={() => onModuleSelect(mod.id as any)}
               className={commonClasses}
             >
-              {content}
+              <div className="flex items-center mb-3 w-full">
+                <div className={`w-16 h-16 ${colors.bg} rounded-lg flex items-center justify-center mr-4 flex-shrink-0`}>
+                  {mod.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">{mod.title}</h3>
+              </div>
+              <p className="text-gray-600">{mod.description}</p>
             </button>
           )
         })}
@@ -225,6 +201,40 @@ const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, isAdmin }) => {
                 </div>
             </button>
         )}
+      </div>
+
+      {/* --- External Resources Section --- */}
+      <div className="mt-16">
+        <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-800">Sumber Belajar Digital & Referensi</h3>
+            <p className="mt-1 text-md text-gray-600">Akses cepat ke sumber daya pendidikan eksternal.</p>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {externalLinks.map(link => {
+                const colors = colorClasses[link.color as keyof typeof colorClasses];
+                return (
+                    <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        id={`tour-step-${link.id}`}
+                        key={link.id}
+                        className={`group flex items-center p-4 border-2 rounded-lg transition-all duration-200 card-shadow ${colors.border} ${colors.hoverBorder} ${colors.hoverBg}`}
+                    >
+                        <div className={`flex-shrink-0 w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center mr-4`}>
+                            <BookmarkIcon />
+                        </div>
+                        <div className="flex-grow">
+                            <h4 className="font-semibold text-gray-800">{link.title}</h4>
+                            <p className="text-sm text-gray-500 hidden sm:block">{link.description}</p>
+                        </div>
+                        <div className="ml-4 text-gray-400 group-hover:text-gray-600 transition-colors">
+                            <ExternalLinkIcon />
+                        </div>
+                    </a>
+                );
+            })}
+        </div>
       </div>
     </div>
   );

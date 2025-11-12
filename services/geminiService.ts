@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Modality, Type, GenerateContentResponse } from "@google/genai";
 import { FormData, GeneratedSection, GroundingSource } from "../types";
 import { ARABIC_SUBJECTS } from "../constants";
@@ -5,7 +6,28 @@ import { ARABIC_SUBJECTS } from "../constants";
 let ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+
+// Define a reusable schema for structured JSON output to improve reliability
+const sectionsSchema = {
+    type: Type.OBJECT,
+    properties: {
+        sections: {
+            type: Type.ARRAY,
+            description: "An array of generated document sections.",
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    id: { type: Type.STRING, description: "Unique identifier for the section (e.g., 'atp', 'naskah_soal')." },
+                    title: { type: Type.STRING, description: "The title of the generated section." },
+                    content: { type: Type.STRING, description: "The full HTML content of the section." },
+                },
+                required: ['id', 'title', 'content'],
+            },
+        },
+    },
+    required: ['sections'],
+};
 
 const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
     try {
@@ -70,15 +92,15 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         5.  **KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)**: Buat tabel KKTP.
         6.  **Jurnal Harian Guru**: Buat format tabel jurnal harian yang siap diisi.
 
-        **Aturan Format JSON:**
+        **Aturan Format:**
         - Root object harus memiliki properti "sections" yang berisi array.
         - Setiap objek section harus memiliki: "id" (string unik, misal "atp"), "title" (string, misal "Analisis CP, TP, dan ATP"), "content" (string HTML).
         - Gunakan tag HTML standar untuk format (<table>, <thead>, <tbody>, <tr>, <th>, <td>, <h3>, <p>, <ul>, <li>).
         - Untuk bahasa Arab, gunakan <p style="text-align:right; direction:rtl;">.
-        - Pastikan JSON valid dan tidak ada markdown.
         `,
         config: {
             responseMimeType: 'application/json',
+            responseSchema: sectionsSchema,
             temperature: 0.7,
             ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 8192 } })
         }
@@ -144,33 +166,79 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
 
     const sectionsToGenerate = [
         { id: "naskah_soal", title: "Naskah Soal" },
-        { id: "kunci_jawaban", title: "Kunci Jawaban & Rubrik Penilaian" }
+        { id: "kunci_jawaban", title: "Kunci Jawaban & Pembahasan" },
+        { id: "analisis_kualitatif", title: "Analisis Soal Kualitatif" },
+        { id: "rubrik_penilaian", title: "Rubrik Penilaian" },
+        { id: "ringkasan_materi", title: "Ringkasan Materi" },
     ];
 
     if (formData.sertakan_kisi_kisi) {
-        sectionsToGenerate.push({ id: "kisi_kisi", title: "Kisi-kisi Soal" });
+        sectionsToGenerate.splice(1, 0, { id: "kisi_kisi", title: "Kisi-kisi Soal" });
     }
+
+    const sectionPrompts = sectionsToGenerate.map((section, index) => {
+        let description = '';
+        switch (section.id) {
+            case 'naskah_soal':
+                description = 'Konten naskah soal lengkap sesuai struktur yang diminta.';
+                break;
+            case 'kisi_kisi':
+                description = 'Buat tabel kisi-kisi soal yang mencakup: No, Capaian Pembelajaran, Materi Pokok, Kelas/Semester, Indikator Soal, Level Kognitif (C1-C6), Bentuk Soal, dan Nomor Soal.';
+                break;
+            case 'kunci_jawaban':
+                description = 'Berikan kunci jawaban untuk PG dan Uraian. Yang terpenting, SERTAKAN PEMBAHASAN/PENJELASAN yang detail untuk SETIAP SOAL, agar siswa bisa belajar dari kesalahan.';
+                break;
+            case 'analisis_kualitatif':
+                description = 'Buat analisis kualitatif dalam bentuk tabel. Kolom tabel mencakup: No. Soal, Aspek yang Dianalisis (Materi, Konstruksi, Bahasa), Keterangan (Sesuai/Tidak Sesuai), dan Catatan/Tindak Lanjut. Analisis ini untuk memastikan kualitas soal.';
+                break;
+            case 'rubrik_penilaian':
+                description = 'Buat rubrik penilaian yang jelas. Untuk Pilihan Ganda, berikan skor per soal (misal, skor 1 jika benar, 0 jika salah). Untuk Uraian, buat rubrik penilaian detail per soal dengan kriteria dan rentang skor (contoh: Skor 0-5 berdasarkan ketepatan konsep, kelengkapan jawaban, dan alur berpikir). Sertakan juga pedoman perhitungan nilai akhir.';
+                break;
+            case 'ringkasan_materi':
+                description = 'Buat ringkasan materi yang padat dan jelas dari topik yang diujikan. Ringkasan ini harus membantu siswa mereview materi sebelum ujian.';
+                break;
+        }
+        return `${index + 1}. **${section.title}**: ${description}`;
+    }).join('\n');
     
+    const pgInstructions = [];
+    if (formData.jenis_soal?.includes('Pilihan Ganda') && formData.jumlah_pg > 0) {
+        pgInstructions.push(`${formData.jumlah_pg} soal pilihan ganda biasa`);
+    }
+    if (formData.sertakan_soal_tka && formData.jumlah_soal_tka > 0) {
+        pgInstructions.push(`${formData.jumlah_soal_tka} soal Pilihan Ganda level TKA (${formData.kelompok_tka})`);
+    }
+
+    const uraianInstructions = [];
+    if (formData.jenis_soal?.includes('Uraian') && formData.jumlah_uraian > 0) {
+        uraianInstructions.push(`${formData.jumlah_uraian} soal uraian biasa`);
+    }
+    if (formData.sertakan_soal_tka_uraian && formData.jumlah_soal_tka_uraian > 0) {
+        uraianInstructions.push(`${formData.jumlah_soal_tka_uraian} soal Uraian level TKA (${formData.kelompok_tka})`);
+    }
+
+    const isianInstructions = [];
+    if (formData.jenis_soal?.includes('Isian Singkat') && formData.jumlah_isian_singkat > 0) {
+        isianInstructions.push(`${formData.jumlah_isian_singkat} soal isian singkat`);
+    }
+
+    const soalStructureParts = [];
+    if (pgInstructions.length > 0) {
+        soalStructureParts.push(`- Bagian Pilihan Ganda: Buat ${pgInstructions.join(' dan ')}. Gabungkan semua soal pilihan ganda dalam satu bagian berlabel "A. Pilihan Ganda" dengan penomoran yang berurutan.`);
+    }
+    if (uraianInstructions.length > 0) {
+        soalStructureParts.push(`- Bagian Uraian: Buat ${uraianInstructions.join(' dan ')}. Gabungkan semua soal uraian dalam satu bagian berlabel "B. Uraian" dengan penomoran yang berurutan, melanjutkan dari bagian sebelumnya.`);
+    }
+    if (isianInstructions.length > 0) {
+        soalStructureParts.push(`- Bagian Isian Singkat: Buat ${isianInstructions.join(' dan ')}. Gabungkan dalam satu bagian berlabel "C. Isian Singkat", melanjutkan penomoran dari bagian sebelumnya.`);
+    }
+
     const soalStructurePrompt = showPesantrenDynamicForm(formData)
         ? (formData.soal_pesantren_sections || []).map(section => 
             `- Bagian ${section.letter}: Buat ${section.count} soal sesuai perintah: "${section.instruction}"`
           ).join('\n')
-        : `
-        ${(formData.jenis_soal?.includes('Pilihan Ganda') && formData.jumlah_pg) ? `- Pilihan Ganda: Buat ${formData.jumlah_pg} soal.` : ''}
-        ${(formData.jenis_soal?.includes('Uraian') && formData.jumlah_uraian) ? `- Uraian: Buat ${formData.jumlah_uraian} soal.` : ''}
-        ${(formData.jenis_soal?.includes('Isian Singkat') && formData.jumlah_isian_singkat) ? `- Isian Singkat: Buat ${formData.jumlah_isian_singkat} soal.` : ''}
-        `;
+        : soalStructureParts.join('\n');
     
-    const tkaPrompt = (formData.sertakan_soal_tka && formData.jumlah_soal_tka) || (formData.sertakan_soal_tka_uraian && formData.jumlah_soal_tka_uraian)
-        ? `
-        **Soal TKA Tambahan (Level UTBK/SNBT):**
-        - Kelompok: ${formData.kelompok_tka}
-        ${(formData.sertakan_soal_tka && formData.jumlah_soal_tka) ? `- Buat ${formData.jumlah_soal_tka} soal TKA Pilihan Ganda.` : ''}
-        ${(formData.sertakan_soal_tka_uraian && formData.jumlah_soal_tka_uraian) ? `- Buat ${formData.jumlah_soal_tka_uraian} soal TKA Uraian.` : ''}
-        - Lanjutkan penomoran soal dari bagian sebelumnya.
-        - Beri judul bagian TKA dengan jelas (contoh: "C. SOAL TKA SAINTEK").
-        ` : '';
-
     const insyaInstruction = formData.mata_pelajaran.toUpperCase() === 'INSYA'
         ? `**Instruksi Khusus Mapel Insya':** Fokus soal adalah pada **penerapan** kaidah Nahwu/Sharaf (Qawaid) dalam membuat kalimat atau menjawab pertanyaan, BUKAN menguji teori. Contoh: Soal "Jim" meminta siswa menyusun kata menjadi kalimat sempurna yang menuntut penerapan i'rab, atau soal "Ba" yang jawabannya memerlukan penggunaan struktur kalimat tertentu.`
         : '';
@@ -189,35 +257,33 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         
         **Struktur Soal yang Diminta:**
         ${soalStructurePrompt}
-        ${tkaPrompt}
         ${insyaInstruction}
 
         **Tugas:**
-        Generate dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
-        ${sectionsToGenerate.map(s => `- **${s.title}**: Buat konten untuk bagian ini.`).join('\n')}
-        - **Ringkasan Materi**: Buat ringkasan materi yang relevan dengan topik ujian sebagai bahan belajar siswa.
+        Generate dokumen-dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
+        ${sectionPrompts}
 
-        **Aturan Format JSON:**
+        **Aturan Format:**
         - Root object harus memiliki properti "sections" yang berisi array.
-        - Setiap objek section harus memiliki: "id" (string unik: "naskah_soal", "kunci_jawaban", "kisi_kisi", "ringkasan_materi"), "title" (string), "content" (string HTML).
+        - Setiap objek section harus memiliki: "id" (string unik: ${sectionsToGenerate.map(s => `"${s.id}"`).join(', ')}), "title" (string), "content" (string HTML).
         - Untuk Naskah Soal, sertakan header ujian yang sudah disediakan di awal kontennya.
-        - Untuk semua dokumen lainnya, sertakan blok tanda tangan guru di akhir kontennya.
+        - Untuk SEMUA DOKUMEN LAINNYA (selain Naskah Soal), sertakan blok tanda tangan guru di akhir kontennya.
         - Gunakan tag HTML standar. Untuk soal pilihan ganda, gunakan format <ol type='A'>.
         - Untuk bahasa Arab, pastikan teks rata kanan dan arah RTL. Gunakan <div dir="rtl" style="text-align: right;"> untuk membungkus konten Arab.
-        - Pastikan JSON valid, tidak ada markdown, dan tidak ada komentar.
         
         **Header Ujian (untuk Naskah Soal):**
         \`\`\`html
         ${headerContent}
         \`\`\`
 
-        **Blok Tanda Tangan (untuk Kunci Jawaban, Kisi-kisi, Ringkasan Materi):**
+        **Blok Tanda Tangan (untuk dokumen selain Naskah Soal):**
         \`\`\`html
         ${signatureBlock}
         \`\`\`
         `,
         config: {
             responseMimeType: 'application/json',
+            responseSchema: sectionsSchema,
             temperature: 0.5,
             ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 8192 } })
         }
@@ -271,10 +337,10 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
         **Aturan Penting:**
         - Gunakan tag HTML standar (<h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <strong>).
         - Pastikan seluruh output adalah satu string HTML yang valid di dalam properti "content".
-        - JSON harus valid, tanpa markdown atau komentar.
         `,
         config: {
             responseMimeType: "application/json",
+            responseSchema: sectionsSchema,
             temperature: 0.7,
             ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 16384 } })
         }
