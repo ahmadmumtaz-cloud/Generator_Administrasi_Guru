@@ -47,6 +47,7 @@ const App: React.FC = () => {
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [shareableLinks, setShareableLinks] = useState<ShareableLink[]>([]);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+  const [registeredTeachers, setRegisteredTeachers] = useState<string[]>([]);
 
 
   useEffect(() => {
@@ -73,6 +74,9 @@ const App: React.FC = () => {
 
       const savedSessionData = localStorage.getItem('savedGenerationSession');
       if (savedSessionData) setSavedSession(JSON.parse(savedSessionData));
+
+      const storedTeachers = localStorage.getItem('registeredTeachers');
+      if (storedTeachers) setRegisteredTeachers(JSON.parse(storedTeachers));
 
       // Shareable Links & Referral Tracking
       const storedLinks = localStorage.getItem('shareableLinks');
@@ -129,6 +133,14 @@ const App: React.FC = () => {
         console.error("Failed to save feedback to localStorage", error);
     }
   }, [feedback]);
+
+  useEffect(() => {
+    try {
+        localStorage.setItem('registeredTeachers', JSON.stringify(registeredTeachers));
+    } catch (error) {
+        console.error("Failed to save registered teachers to localStorage", error);
+    }
+  }, [registeredTeachers]);
   
   const handleStart = () => {
     setShowWelcomeScreen(false);
@@ -407,10 +419,86 @@ const App: React.FC = () => {
       showNotification('Link berhasil dihapus.', 'success');
   };
 
+  const handleAddTeachers = (newTeachers: string[]) => {
+      setRegisteredTeachers(prev => {
+          const combined = [...prev, ...newTeachers];
+          const uniqueTeachers = [...new Set(combined)]; // Remove duplicates
+          showNotification(`${newTeachers.length} guru berhasil ditambahkan.`, 'success');
+          return uniqueTeachers;
+      });
+  };
+
+  const handleBackupData = () => {
+      try {
+          const storedKaryawan = localStorage.getItem('dataKaryawan');
+          const dataKaryawan = storedKaryawan ? JSON.parse(storedKaryawan) : [];
+
+          const backupData = {
+              version: '1.1', // Incremented version for new data structure
+              timestamp: new Date().toISOString(),
+              history,
+              activityLog,
+              feedback,
+              shareableLinks,
+              registeredTeachers,
+              currentUser,
+              dataKaryawan, // Include performance report data
+          };
+          const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `guru_inovatif_backup_${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showNotification('Data berhasil di-backup!', 'success');
+      } catch (error) {
+          console.error("Backup failed:", error);
+          showNotification('Gagal membuat backup data.', 'error');
+      }
+  };
+  
+  const handleRestoreData = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+          try {
+              const text = e.target?.result as string;
+              const data = JSON.parse(text);
+
+              if (!data.version || !data.timestamp) {
+                  throw new Error("Invalid backup file format.");
+              }
+              
+              if (data.history) setHistory(data.history);
+              if (data.activityLog) setActivityLog(data.activityLog);
+              if (data.feedback) setFeedback(data.feedback);
+              if (data.shareableLinks) setShareableLinks(data.shareableLinks);
+              if (data.registeredTeachers) setRegisteredTeachers(data.registeredTeachers);
+              // Restore performance report data
+              if (data.dataKaryawan) {
+                  localStorage.setItem('dataKaryawan', JSON.stringify(data.dataKaryawan));
+              }
+              
+              showNotification('Data berhasil dipulihkan! Aplikasi akan dimuat ulang.', 'success');
+              setTimeout(() => window.location.reload(), 2000);
+          } catch (err) {
+              console.error("Restore failed:", err);
+              showNotification('File backup tidak valid atau rusak.', 'error');
+          }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; // Reset file input
+  };
+
+
   const renderContent = () => {
     switch(view) {
         case 'dashboard':
-            return <Dashboard onModuleSelect={handleModuleSelect} isAdmin={currentUser === ADMIN_USER} />;
+            return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} />;
         case 'form':
             return currentModule && (
                 <GeneratorForm 
@@ -444,7 +532,7 @@ const App: React.FC = () => {
         case 'videoLab':
             return <VideoLab onBack={handleBack} />;
         default:
-            return <Dashboard onModuleSelect={handleModuleSelect} isAdmin={currentUser === ADMIN_USER} />;
+            return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} />;
     }
   }
 
@@ -501,6 +589,8 @@ const App: React.FC = () => {
               links={shareableLinks}
               onAddLink={handleAddLink}
               onDeleteLink={handleDeleteLink}
+              onBackupData={handleBackupData}
+              onRestoreData={handleRestoreData}
           />
       )}
 

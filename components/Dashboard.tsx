@@ -3,7 +3,7 @@ import { Module, View } from '../types';
 
 interface DashboardProps {
   onModuleSelect: (module: Module | View) => void;
-  isAdmin: boolean;
+  currentUser: string | null;
 }
 
 const modules = [
@@ -138,30 +138,25 @@ const ExternalLinkIcon = () => (
 );
 
 
-const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, isAdmin }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser }) => {
   const generatorModules = modules.filter(m => !('url' in m));
   const externalLinks = modules.filter(m => 'url' in m);
-  
-  const allowedUserModules = ['admin', 'soal'];
-  const visibleGeneratorModules = isAdmin ? generatorModules : generatorModules.filter(mod => allowedUserModules.includes(mod.id));
-  
-  const gridLayoutClass = isAdmin
-    ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
-    : "grid-cols-1 md:grid-cols-2";
+  const isAdmin = currentUser === 'Admin Guru';
 
   return (
     <div className="fade-in">
       <div className="text-center mb-10">
         <h2 className="text-3xl font-bold text-gray-900">Selamat Datang di Toolkit AI Guru</h2>
-        <p className="mt-1 text-xl font-semibold text-gray-700">YAYASAN PENDIDIKAN ISLAM PONDOK MODERN AL-GHOZALI</p>
+        <p className="mt-2 text-xl font-semibold text-gray-800">Lembaga Penjaminan Mutu Pendidikan (LPMP)</p>
+        <p className="mt-1 text-lg text-gray-700">YAYASAN PENDIDIKAN ISLAM PONDOK MODERN AL-GHOZALI</p>
         <p className="mt-4 text-lg text-gray-600">
-          {isAdmin ? "Pilih salah satu alat canggih di bawah ini untuk memulai." : "Silakan pilih modul yang tersedia untuk memulai."}
+          Pilih salah satu alat canggih di bawah ini untuk memulai.
         </p>
       </div>
 
       {/* --- Main Generator Modules --- */}
-      <div className={`grid ${gridLayoutClass} gap-6`}>
-        {visibleGeneratorModules.map((mod) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {generatorModules.map((mod) => {
           const colors = colorClasses[mod.color as keyof typeof colorClasses];
           const commonClasses = `module-btn p-6 border-2 ${colors.border} rounded-lg ${colors.hoverBorder} ${colors.hoverBg} transition-all duration-200 text-left flex flex-col items-start card-shadow`;
           

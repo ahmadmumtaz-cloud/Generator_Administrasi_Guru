@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { textToSpeech } from '../services/geminiService';
 
 interface TourStep {
   selector: string;
@@ -56,24 +55,8 @@ interface OnboardingTourProps {
 const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, onComplete }) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [popoverStyle, setPopoverStyle] = useState({});
-  const [isAudioLoading, setIsAudioLoading] = useState(false);
-  const [isAudioDisabled, setIsAudioDisabled] = useState(false);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
   
   const currentStep = tourSteps[stepIndex];
-
-  const stopAudio = useCallback(() => {
-    if (audioSourceRef.current) {
-        audioSourceRef.current.stop();
-        audioSourceRef.current.disconnect();
-    }
-    if (audioContextRef.current) {
-        audioContextRef.current.close();
-    }
-    audioSourceRef.current = null;
-    audioContextRef.current = null;
-  }, []);
 
   const updateTargetElement = useCallback(() => {
     if (!isOpen || !currentStep) return;
@@ -109,54 +92,22 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, onComplete }) =
   }, [isOpen, currentStep]);
 
   useEffect(() => {
-    const playStepAudio = async (text: string) => {
-        if (isAudioDisabled) return;
-        
-        stopAudio();
-        setIsAudioLoading(true);
-        try {
-            const audioBuffer = await textToSpeech(text);
-            const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-            const source = context.createBufferSource();
-            source.buffer = audioBuffer;
-            source.connect(context.destination);
-            source.onended = stopAudio;
-            source.start();
-            audioContextRef.current = context;
-            audioSourceRef.current = source;
-        } catch (error: any) {
-            const errorMessage = error.toString();
-            if (errorMessage.includes('429') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
-                console.warn("TTS quota exceeded. Disabling audio guide for this session.");
-                setIsAudioDisabled(true);
-            } else {
-                console.error("Failed to play tour audio:", error);
-            }
-        } finally {
-            setIsAudioLoading(false);
-        }
-    };
-    
     if (isOpen && currentStep) {
         setTimeout(() => {
             updateTargetElement();
-            const audioText = `${currentStep.title}. ${currentStep.content}`;
-            playStepAudio(audioText);
         }, 100);
     }
 
     window.addEventListener('resize', updateTargetElement);
     return () => {
         window.removeEventListener('resize', updateTargetElement);
-        stopAudio();
     };
-  }, [stepIndex, isOpen, currentStep, updateTargetElement, stopAudio, isAudioDisabled]);
+  }, [stepIndex, isOpen, currentStep, updateTargetElement]);
   
   const handleComplete = useCallback(() => {
-    stopAudio();
     document.querySelectorAll('.tour-spotlight').forEach(el => el.classList.remove('tour-spotlight'));
     onComplete();
-  }, [onComplete, stopAudio]);
+  }, [onComplete]);
 
   const handleNext = () => {
     if (stepIndex < tourSteps.length - 1) {
@@ -183,20 +134,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, onComplete }) =
         <h3 className="text-lg font-bold text-gray-900 mb-2">{currentStep.title}</h3>
         <p className="text-sm text-gray-600 mb-4">{currentStep.content}</p>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {!isAudioDisabled && (
-                isAudioLoading ? (
-                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-                    </svg>
-                )
-            )}
-            <span className="text-xs font-bold text-gray-500">
-              {stepIndex + 1} / {tourSteps.length}
-            </span>
-          </div>
+          <span className="text-xs font-bold text-gray-500">
+            {stepIndex + 1} / {tourSteps.length}
+          </span>
           <div className="space-x-2">
             {stepIndex > 0 && (
               <button onClick={handlePrev} className="text-sm font-medium text-gray-600 hover:text-gray-900">

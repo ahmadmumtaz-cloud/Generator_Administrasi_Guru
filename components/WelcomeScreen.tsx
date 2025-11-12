@@ -17,7 +17,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         isPlaying = true;
 
         try {
-            const welcomeText = "Selamat datang di aplikasi generator administrasi guru dan bank soal adaptif Yayasan Pendidikan Islam Pondok Modern Al-Ghozali";
+            const welcomeText = "Selamat Datang di Platform AI Guru Inovatif. Lembaga Penjaminan Mutu Pendidikan. YPI Pondok Modern Al-Ghozali";
             const audioBuffer = await textToSpeech(welcomeText);
             
             if (audioSourceRef.current) audioSourceRef.current.stop();
@@ -62,7 +62,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         <h1 className="text-5xl font-bold text-yellow-400 mb-4">
           Selamat Datang di Platform AI Guru Inovatif
         </h1>
-        <p className="text-2xl font-semibold text-gray-200 mb-8">
+        <p className="text-2xl font-semibold text-gray-200 mb-2">
+          Lembaga Penjaminan Mutu Pendidikan (LPMP)
+        </p>
+        <p className="text-xl text-gray-300 mb-8">
           YPI Pondok Modern Al-Ghozali
         </p>
         <p className="text-lg text-gray-300 mb-12 leading-relaxed">
