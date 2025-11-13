@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Modality, Type, GenerateContentResponse } from "@google/genai";
 import { FormData, GeneratedSection, GroundingSource } from "../types";
 import { ARABIC_SUBJECTS } from "../constants";
@@ -6,7 +5,7 @@ import { ARABIC_SUBJECTS } from "../constants";
 let ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -29,12 +28,12 @@ const sectionsSchema = {
     required: ['sections'],
 };
 
-const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
+const withRetry = async <T>(fn: () => Promise<T>, retries = 4, delay = 2000): Promise<T> => {
     try {
         return await fn();
     } catch (error: any) {
-        if (retries > 0) {
-            console.warn(`Retrying... attempts left: ${retries}`);
+        if (retries > 0 && (error.toString().includes('503') || error.toString().includes('UNAVAILABLE'))) {
+            console.warn(`Model overloaded. Retrying... attempts left: ${retries}`);
             await new Promise(res => setTimeout(res, delay));
             return withRetry(fn, retries - 1, delay * 2);
         }
@@ -48,25 +47,25 @@ export const reinitializeGoogleGenAI = () => {
 
 export const getCPSuggestions = async (formData: Partial<FormData>): Promise<string> => {
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Buat daftar Elemen Capaian Pembelajaran (CP) untuk mata pelajaran ${formData.mata_pelajaran}, jenjang ${formData.jenjang}, kelas ${formData.kelas}, fase ${formData.fase}. Sajikan dalam format Markdown dengan poin-poin.`,
-    });
+    }));
     return response.text;
 };
 
 export const getTopicSuggestions = async (formData: Partial<FormData>): Promise<string> => {
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Berikan daftar ide Topik/Materi Pembelajaran yang relevan untuk mata pelajaran ${formData.mata_pelajaran}, jenjang ${formData.jenjang}, kelas ${formData.kelas}, fase ${formData.fase} untuk semester ${formData.semester}. Sajikan dalam format Markdown dengan poin-poin.`,
-    });
+    }));
     return response.text;
 };
 
 export const generateAdminContent = async (formData: FormData): Promise<GeneratedSection[]> => {
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Anda adalah asisten ahli untuk guru di Indonesia. Buatkan dokumen administrasi guru lengkap sesuai Kurikulum Merdeka.
         **Data:**
@@ -104,7 +103,7 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
             temperature: 0.7,
             ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 8192 } })
         }
-    });
+    }));
 
     const jsonString = response.text.trim();
     const result = JSON.parse(jsonString);
@@ -244,7 +243,7 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         : '';
 
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Anda adalah AI pembuat soal ujian ahli. Buatkan paket asesmen lengkap berdasarkan data berikut.
         **Data:**
@@ -287,7 +286,7 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
             temperature: 0.5,
             ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 8192 } })
         }
-    });
+    }));
 
     const jsonString = response.text.trim();
     const result = JSON.parse(jsonString);
@@ -301,7 +300,7 @@ const showPesantrenDynamicForm = (formData: FormData): boolean => {
 
 export const generateEcourseContent = async (formData: FormData): Promise<GeneratedSection[]> => {
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Anda adalah seorang *Instructional Designer* ahli. Tugas Anda adalah merancang dan membuat E-Course lengkap berdasarkan data berikut.
 
@@ -344,7 +343,7 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
             temperature: 0.7,
             ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 16384 } })
         }
-    });
+    }));
 
     const jsonString = response.text.trim();
     const result = JSON.parse(jsonString);
@@ -367,6 +366,98 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
     
     return result.sections;
 };
+
+export const generateCombinedContent = async (formData: FormData, textContent: string): Promise<{ administrasi_guru: GeneratedSection[], bank_soal: GeneratedSection[] }> => {
+    const combinedSchema = {
+        type: Type.OBJECT,
+        properties: {
+            administrasi_guru: {
+                type: Type.ARRAY,
+                description: "Array of teacher administration document sections.",
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        id: { type: Type.STRING },
+                        title: { type: Type.STRING },
+                        content: { type: Type.STRING },
+                    },
+                    required: ['id', 'title', 'content'],
+                },
+            },
+            bank_soal: {
+                type: Type.ARRAY,
+                description: "Array of question bank document sections.",
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        id: { type: Type.STRING },
+                        title: { type: Type.STRING },
+                        content: { type: Type.STRING },
+                    },
+                    required: ['id', 'title', 'content'],
+                },
+            },
+        },
+        required: ['administrasi_guru', 'bank_soal'],
+    };
+
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: `Anda adalah AI perancang kurikulum ahli untuk sistem pendidikan Indonesia.
+        **Tugas Utama:** Berdasarkan teks buku ajar dan metadata yang diberikan, buat DUA paket dokumen lengkap secara bersamaan: (1) Paket Administrasi Guru, dan (2) Paket Bank Soal.
+
+        **Metadata:**
+        - Jenjang: ${formData.jenjang}
+        - Kelas: ${formData.kelas}
+        - Mata Pelajaran: ${formData.mata_pelajaran}
+        - Guru: ${formData.nama_guru}
+        - Sekolah: ${formData.sekolah}
+        - Tahun Ajaran: ${formData.tahun_ajaran}
+        - Semester: ${formData.semester === '1' ? 'Ganjil' : 'Genap'}
+
+        **Konten Buku Ajar (Sumber Utama):**
+        """
+        ${textContent}
+        """
+
+        **Instruksi Pembuatan:**
+        
+        **1. PAKET ADMINISTRASI GURU LENGKAP:**
+           - **Analisis CP, TP, dan ATP**: Buat tabel ATP yang runut.
+           - **Program Tahunan (Prota)**: Buat tabel Prota.
+           - **Program Semester (Promes)**: Buat tabel Promes.
+           - **PENTING: Buat 5 (LIMA) buah Modul Ajar yang berbeda dan lengkap.** Setiap modul harus mencakup komponen seperti Tujuan Pembelajaran, Kegiatan Pembelajaran (Pendahuluan, Inti, Penutup), dan Asesmen.
+           - **KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)**: Buat tabel KKTP.
+           - **Jurnal Harian Guru**: Buat format tabel jurnal harian yang siap diisi.
+
+        **2. PAKET BANK SOAL LENGKAP:**
+           - **Kisi-kisi Soal**: Buat tabel kisi-kisi soal yang relevan.
+           - **Naskah Soal**: Buat naskah soal yang terdiri dari 15 Pilihan Ganda dan 5 Uraian, lengkap dengan header sekolah.
+           - **Kunci Jawaban & Pembahasan**: Sediakan kunci jawaban dan pembahasan mendetail untuk setiap soal.
+           - **Analisis Soal Kualitatif**: Buat tabel analisis kualitatif.
+           - **Rubrik Penilaian**: Sediakan rubrik penilaian yang jelas untuk soal uraian.
+           - **Ringkasan Materi**: Buat ringkasan materi dari teks buku ajar yang diberikan.
+
+        **Aturan Format Output:**
+        - Sajikan seluruh output dalam format JSON sesuai skema yang diberikan.
+        - JSON harus memiliki dua properti utama: "administrasi_guru" dan "bank_soal".
+        - Setiap properti harus berisi array dari objek-objek section.
+        - Setiap objek section harus memiliki: "id" (string unik), "title" (string), dan "content" (string dalam format HTML).
+        - Gunakan tag HTML standar (<table>, <h3>, <p>, <ul>, <li>, dll.) untuk konten.
+        `,
+        config: {
+            responseMimeType: 'application/json',
+            responseSchema: combinedSchema,
+            temperature: 0.6,
+            ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 16384 } })
+        }
+    }));
+
+    const jsonString = response.text.trim();
+    const result = JSON.parse(jsonString);
+    return result;
+};
+
 
 // --- Missing Functions Implementation ---
 
@@ -396,7 +487,7 @@ async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: 
 
 export const textToSpeech = async (text: string): Promise<AudioBuffer> => {
     // FIX: Explicitly type the response from generateContent to resolve the type error on 'candidates'.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: `Say with a friendly and clear female Indonesian voice: ${text}` }] }],
         config: {
@@ -405,7 +496,7 @@ export const textToSpeech = async (text: string): Promise<AudioBuffer> => {
                 voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
             },
         },
-    });
+    }));
     const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
     if (!base64Audio) {
         throw new Error("No audio data returned from TTS API.");
@@ -460,7 +551,7 @@ export const editImage = async (base64ImageData: string, mimeType: string, promp
 
 export const analyzeImage = async (base64ImageData: string, mimeType: string, prompt: string): Promise<string> => {
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: {
             parts: [
@@ -468,7 +559,7 @@ export const analyzeImage = async (base64ImageData: string, mimeType: string, pr
                 { text: prompt },
             ],
         },
-    });
+    }));
     return response.text;
 };
 
@@ -501,7 +592,7 @@ export const analyzeVideoFrames = async (frames: { data: string; mimeType: strin
     }));
 
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: {
             parts: [
@@ -509,7 +600,7 @@ export const analyzeVideoFrames = async (frames: { data: string; mimeType: strin
                 { text: prompt }
             ],
         },
-    });
+    }));
     return response.text;
 };
 
@@ -522,11 +613,11 @@ export const groundedSearch = async (query: string, tool: 'web' | 'maps', locati
     }
     
     // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await ai.models.generateContent({
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: query,
         config,
-    });
+    }));
 
     const text = response.text;
     const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];

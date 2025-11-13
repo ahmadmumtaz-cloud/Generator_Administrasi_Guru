@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
 import GeneratorForm from './components/GeneratorForm';
+import PdfUploadForm from './components/PdfUploadForm'; // Import baru
 import ResultsDisplay from './components/ResultsDisplay';
 import HistoryList from './components/HistoryList';
 import AIAssistantModal from './components/AIAssistantModal';
@@ -20,7 +21,7 @@ import FeedbackForm from './components/FeedbackForm';
 import OnboardingTour from './components/OnboardingTour';
 import AdminPanel from './components/AdminPanel';
 import { View, Module, FormData, HistoryItem, NotificationType, GeneratedSection, ActivityLogItem, FeedbackItem, ShareableLink } from './types';
-import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections, generateEcourseContent } from './services/geminiService';
+import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections, generateEcourseContent, generateCombinedContent } from './services/geminiService';
 
 const ADMIN_USER = "Admin Guru";
 
@@ -198,6 +199,10 @@ const App: React.FC = () => {
         setCurrentModule(module);
         setView('form');
         setGeneratedSections([]);
+    } else if (module === 'pdf') {
+        setCurrentModule(module);
+        setView('pdfUpload');
+        setGeneratedSections([]);
     } else if (module === 'adminPanel') {
         setIsAdminPanelOpen(true);
     } else {
@@ -239,34 +244,99 @@ const App: React.FC = () => {
     setActivityLog(prev => [newLog, ...prev]);
   };
 
+  const startLoadingSimulation = (formData: FormData) => {
+      setIsLoading(true);
+      setGeneratedSections([]);
+      setLastSubmittedFormData(formData);
+      setGenerationProgress(0);
+      clearProgressInterval();
+
+      const SIMULATED_DURATION = formData.use_thinking_mode ? 15000 : 8000;
+      const MAX_SIMULATED_PROGRESS = 95;
+      const startTime = Date.now();
+
+      progressIntervalRef.current = window.setInterval(() => {
+        const elapsedTime = Date.now() - startTime;
+        const progress = Math.min(
+          (elapsedTime / SIMULATED_DURATION) * 100,
+          MAX_SIMULATED_PROGRESS
+        );
+        setGenerationProgress(progress);
+        if (progress >= MAX_SIMULATED_PROGRESS) {
+          clearProgressInterval();
+        }
+      }, 100);
+  }
+  
+  const finishLoadingSimulation = (callback: () => void) => {
+      clearProgressInterval();
+      setGenerationProgress(100);
+
+      setTimeout(() => {
+        callback();
+        setIsLoading(false);
+      }, 500);
+  }
+
+  const handlePdfSubmit = async (formData: FormData, textContent: string) => {
+      if (!currentModule) return;
+      localStorage.removeItem('savedGenerationSession');
+      setSavedSession(null);
+      startLoadingSimulation(formData);
+
+      try {
+        const { administrasi_guru, bank_soal } = await generateCombinedContent(formData, textContent);
+        
+        finishLoadingSimulation(() => {
+            const allSections = [...administrasi_guru, ...bank_soal];
+            setGeneratedSections(allSections);
+            setView('results');
+
+            // Create two history items from one generation
+            const adminHistoryItem: HistoryItem = {
+              id: `admin_${Date.now()}`,
+              ...formData,
+              module_type: 'admin',
+              generated_sections: administrasi_guru,
+              created_at: new Date().toISOString(),
+            };
+             const soalHistoryItem: HistoryItem = {
+              id: `soal_${Date.now()}`,
+              ...formData,
+              module_type: 'soal',
+              generated_sections: bank_soal,
+              created_at: new Date().toISOString(),
+            };
+
+            setHistory(prev => [soalHistoryItem, adminHistoryItem, ...prev]);
+            
+            // Add two activity logs
+            addActivityLog(formData, 'admin');
+            addActivityLog(formData, 'soal');
+            
+            showNotification('Paket Administrasi & Bank Soal berhasil digenerate!', 'success');
+        });
+
+      } catch (error) {
+        console.error("Error generating combined content:", error);
+        const errorMessage = (error as Error).toString().includes('503') || (error as Error).toString().includes('UNAVAILABLE')
+            ? 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.'
+            : 'Terjadi kesalahan saat generate. Silakan coba lagi.';
+        showNotification(errorMessage, 'error');
+        setView('pdfUpload');
+        setIsLoading(false);
+        clearProgressInterval();
+        setGenerationProgress(0);
+      }
+  };
+
 
   const handleFormSubmit = async (formData: FormData) => {
     if (!currentModule) return;
     
     localStorage.removeItem('savedGenerationSession');
     setSavedSession(null);
-    
-    setIsLoading(true);
-    setGeneratedSections([]);
-    setLastSubmittedFormData(formData);
-    setGenerationProgress(0);
-    clearProgressInterval();
-
-    const SIMULATED_DURATION = formData.use_thinking_mode ? 15000 : 8000;
-    const MAX_SIMULATED_PROGRESS = 95;
-    const startTime = Date.now();
-
-    progressIntervalRef.current = window.setInterval(() => {
-      const elapsedTime = Date.now() - startTime;
-      const progress = Math.min(
-        (elapsedTime / SIMULATED_DURATION) * 100,
-        MAX_SIMULATED_PROGRESS
-      );
-      setGenerationProgress(progress);
-      if (progress >= MAX_SIMULATED_PROGRESS) {
-        clearProgressInterval();
-      }
-    }, 100);
+    startLoadingSimulation(formData);
 
     try {
       let sections: GeneratedSection[] = [];
@@ -278,29 +348,28 @@ const App: React.FC = () => {
         sections = await generateEcourseContent(formData);
       }
       
-      clearProgressInterval();
-      setGenerationProgress(100);
-
-      setTimeout(() => {
-        setGeneratedSections(sections);
-        setView('results');
-        
-        const newHistoryItem: HistoryItem = {
-          id: Date.now().toString(),
-          ...formData,
-          module_type: currentModule,
-          generated_sections: sections,
-          created_at: new Date().toISOString(),
-        };
-        setHistory(prev => [newHistoryItem, ...prev]);
-        addActivityLog(formData, currentModule);
-        showNotification('Perangkat berhasil digenerate!', 'success');
-        setIsLoading(false);
-      }, 500);
+      finishLoadingSimulation(() => {
+          setGeneratedSections(sections);
+          setView('results');
+          
+          const newHistoryItem: HistoryItem = {
+            id: Date.now().toString(),
+            ...formData,
+            module_type: currentModule,
+            generated_sections: sections,
+            created_at: new Date().toISOString(),
+          };
+          setHistory(prev => [newHistoryItem, ...prev]);
+          addActivityLog(formData, currentModule);
+          showNotification('Perangkat berhasil digenerate!', 'success');
+      });
 
     } catch (error) {
       console.error("Error generating content:", error);
-      showNotification('Terjadi kesalahan saat generate. Silakan coba lagi.', 'error');
+      const errorMessage = (error as Error).toString().includes('503') || (error as Error).toString().includes('UNAVAILABLE')
+          ? 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.'
+          : 'Terjadi kesalahan saat generate. Silakan coba lagi.';
+      showNotification(errorMessage, 'error');
       setView('form');
       setIsLoading(false);
       clearProgressInterval();
@@ -506,6 +575,15 @@ const App: React.FC = () => {
                     onSubmit={handleFormSubmit}
                     onBack={handleBack}
                     onShowAIAssistant={handleShowAIAssistant}
+                    isLoading={isLoading}
+                    generationProgress={generationProgress}
+                />
+            );
+        case 'pdfUpload':
+             return (
+                <PdfUploadForm
+                    onSubmit={handlePdfSubmit}
+                    onBack={handleBack}
                     isLoading={isLoading}
                     generationProgress={generationProgress}
                 />

@@ -8,6 +8,18 @@ interface DashboardProps {
 
 const modules = [
   {
+    id: 'pdf',
+    title: 'Generator Terpusat',
+    description: 'Salin teks dari PDF/dokumen buku ajar untuk hasilkan Administrasi Guru & Bank Soal sekaligus.',
+    icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+        </svg>
+    ),
+    color: 'indigo',
+    isFeatured: true,
+  },
+  {
     id: 'admin',
     title: 'Generator Administrasi Guru',
     description: 'ATP, Prota, Promes, Modul Ajar, KKTP, & Jurnal Harian.',
@@ -156,22 +168,27 @@ const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser }) =>
 
       {/* --- Main Generator Modules --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {generatorModules.map((mod) => {
+        {generatorModules.map((mod: any) => {
           const colors = colorClasses[mod.color as keyof typeof colorClasses];
+          const isFeatured = mod.isFeatured;
           const commonClasses = `module-btn p-6 border-2 ${colors.border} rounded-lg ${colors.hoverBorder} ${colors.hoverBg} transition-all duration-200 text-left flex flex-col items-start card-shadow`;
-          
+          const featuredClasses = isFeatured ? 'md:col-span-2 lg:col-span-4' : '';
+
           return (
             <button
               id={`tour-step-${mod.id}`}
               key={mod.id}
               onClick={() => onModuleSelect(mod.id as any)}
-              className={commonClasses}
+              className={`${commonClasses} ${featuredClasses}`}
             >
               <div className="flex items-center mb-3 w-full">
                 <div className={`w-16 h-16 ${colors.bg} rounded-lg flex items-center justify-center mr-4 flex-shrink-0`}>
                   {mod.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">{mod.title}</h3>
+                <div>
+                  <h3 className={`font-semibold text-gray-900 ${isFeatured ? 'text-2xl' : 'text-xl'}`}>{mod.title}</h3>
+                   {isFeatured && <span className="text-xs font-bold bg-yellow-300 text-yellow-800 px-2 py-0.5 rounded-full">FITUR UNGGULAN</span>}
+                </div>
               </div>
               <p className="text-gray-600">{mod.description}</p>
             </button>

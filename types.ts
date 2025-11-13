@@ -1,5 +1,5 @@
-export type View = 'dashboard' | 'form' | 'results' | 'audioLab' | 'groundedSearch' | 'imageLab' | 'videoLab' | 'adminPanel' | 'ecourse';
-export type Module = 'admin' | 'soal' | 'ecourse';
+export type View = 'dashboard' | 'form' | 'results' | 'audioLab' | 'groundedSearch' | 'imageLab' | 'videoLab' | 'adminPanel' | 'ecourse' | 'pdfUpload';
+export type Module = 'admin' | 'soal' | 'ecourse' | 'pdf';
 export type NotificationType = 'success' | 'error' | 'warning';
 
 export interface GeneratedSection {

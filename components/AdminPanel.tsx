@@ -1523,18 +1523,51 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           </button>
         </div>
 
-        <div className="border-b border-gray-200 mb-6 flex-shrink-0">
-            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                <button onClick={() => setActiveTab('performance')} className={`${activeTab === 'performance' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>
-                    Raport Kinerja Guru
+        <div className="mb-6 flex-shrink-0">
+            <div className="bg-gray-100 p-1.5 rounded-xl flex items-center justify-center space-x-2">
+                <button
+                    onClick={() => setActiveTab('performance')}
+                    className={`flex items-center justify-center w-full px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                        activeTab === 'performance'
+                            ? 'bg-white text-indigo-700 shadow-md'
+                            : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-700'
+                    }`}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                      <path d="M12 2.252A8.014 8.014 0 0117.748 12H12V2.252z" />
+                    </svg>
+                    <span>Raport Kinerja Guru</span>
                 </button>
-                <button onClick={() => setActiveTab('tracking')} className={`${activeTab === 'tracking' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>
-                    Pelacakan Pengguna
+                <button
+                    onClick={() => setActiveTab('tracking')}
+                    className={`flex items-center justify-center w-full px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                        activeTab === 'tracking'
+                            ? 'bg-white text-indigo-700 shadow-md'
+                            : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-700'
+                    }`}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.5-1.5a2 2 0 112.828-2.828l1.5 1.5 3-3zm-2.828 8.414a2 2 0 012.828 0l3 3a2 2 0 01-2.828 2.828l-3-3a2 2 0 010-2.828zM5 9a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Pelacakan Pengguna</span>
                 </button>
-                 <button onClick={() => setActiveTab('backup')} className={`${activeTab === 'backup' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>
-                    Manajemen Data
+                <button
+                    onClick={() => setActiveTab('backup')}
+                    className={`flex items-center justify-center w-full px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                        activeTab === 'backup'
+                            ? 'bg-white text-indigo-700 shadow-md'
+                            : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-700'
+                    }`}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
+                      <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
+                      <path d="M10 2C6.134 2 3 3.343 3 5s3.134 3 7 3 7-1.343 7-3-3.134-3-7-3z" />
+                    </svg>
+                    <span>Manajemen Data</span>
                 </button>
-            </nav>
+            </div>
         </div>
 
         <div className="flex-grow overflow-y-auto pr-4">
