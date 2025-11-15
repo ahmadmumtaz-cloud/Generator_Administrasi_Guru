@@ -6,8 +6,59 @@ import { textToSpeech } from '../services/geminiService';
 
 const downloadDoc = (fileName: string, content: string, formData: FormData | null) => {
     const isArabicContext = formData?.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData?.mata_pelajaran || '');
-    const fontAndDirectionStyles = isArabicContext ? `body { font-family: 'Times New Roman', serif; direction: rtl; font-size: 12pt; } h1, h2, h3, h4, th { text-align: right; }` : `body { font-family: 'Times New Roman', serif; direction: ltr; font-size: 12pt; }`;
-    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${fileName}</title><style>@page WordSection1 { size: 8.5in 14.0in; margin: 2cm; } div.WordSection1 { page: WordSection1; } ${fontAndDirectionStyles} table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid black; padding: 5px; } th { background-color: #f2f2f2; } h1, h2, h3, h4 { font-family: 'Arial', sans-serif; }</style></head><body><div class="WordSection1">`;
+
+    // Set a smaller font size to ensure content fits portrait legal paper
+    const fontAndDirectionStyles = isArabicContext 
+        ? `body { font-family: 'Times New Roman', serif; direction: rtl; font-size: 10pt; }` 
+        : `body { font-family: 'Times New Roman', serif; direction: ltr; font-size: 10pt; }`;
+
+    const styles = `
+        @page WordSection1 {
+            size: 8.5in 14.0in; /* US Legal, Portrait */
+            margin: 1.5cm;
+            mso-header-margin:.5in;
+            mso-footer-margin:.5in;
+            mso-paper-source:0;
+        }
+        div.WordSection1 {
+            page: WordSection1;
+        }
+        ${fontAndDirectionStyles}
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: auto;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 4px; /* Reduced padding */
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word; /* Ensure long text wraps */
+            overflow-wrap: break-word;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+            font-weight: bold;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Arial', sans-serif;
+            page-break-after: avoid;
+        }
+        /* Specific alignment for Arabic text in tables */
+        ${isArabicContext ? `th, td { text-align: right; }` : ''}
+    `;
+
+    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+            <meta charset='utf-8'>
+            <title>${fileName}</title>
+            <style>${styles}</style>
+        </head>
+        <body>
+            <div class="WordSection1 ${isArabicContext ? 'arabic-font-preview' : ''}">
+    `;
     const footer = "</div></body></html>";
     const sourceHTML = header + content + footer;
     const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
