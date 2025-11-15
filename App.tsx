@@ -669,6 +669,7 @@ const App: React.FC = () => {
               onDeleteLink={handleDeleteLink}
               onBackupData={handleBackupData}
               onRestoreData={handleRestoreData}
+              onAddTeachers={handleAddTeachers}
           />
       )}
 

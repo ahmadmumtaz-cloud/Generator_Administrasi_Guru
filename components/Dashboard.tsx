@@ -209,7 +209,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser }) =>
                 </div>
                 <div>
                     <h3 className="text-xl font-semibold text-gray-900">Ruang Admin</h3>
-                    <p className="text-gray-600">Kelola pengguna dan lihat statistik penggunaan aplikasi.</p>
+                    <p className="text-gray-600">Kelola raport kinerja, tautan pengguna, backup, dan restore data aplikasi.</p>
                 </div>
             </button>
         )}

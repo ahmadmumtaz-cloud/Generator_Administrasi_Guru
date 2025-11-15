@@ -9,9 +9,10 @@ interface AdminPanelProps {
   onDeleteLink: (id: string) => void;
   onBackupData: () => void;
   onRestoreData: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onAddTeachers: (teachers: string[]) => void;
 }
 
-type AdminTab = 'tracking' | 'performance' | 'backup';
+type AdminTab = 'performanceReport' | 'tracking' | 'dataManagement';
 
 const reportHtml = `
 <!DOCTYPE html>
@@ -1414,11 +1415,11 @@ if (unitDefault === 'SMP ISLAM AL-GHOZALI') {
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ 
     isOpen, onClose, links, onAddLink, onDeleteLink,
-    onBackupData, onRestoreData
+    onBackupData, onRestoreData, onAddTeachers
 }) => {
   const [newUserName, setNewUserName] = useState('');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<AdminTab>('performance');
+  const [activeTab, setActiveTab] = useState<AdminTab>('performanceReport');
 
   const handleAddClick = () => {
     if (newUserName.trim()) {
@@ -1433,18 +1434,66 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         setTimeout(() => setCopiedUrl(null), 2000);
     });
   };
+  
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const text = e.target?.result as string;
+            let teachers: string[] = [];
+
+            if (file.name.endsWith('.csv')) {
+                teachers = text.split('\n')
+                             .map(line => line.split(',')[0].trim())
+                             .filter(name => name.length > 0);
+                // Simple header check
+                if (teachers[0] && (teachers[0].toLowerCase().includes('nama') || teachers[0].toLowerCase().includes('name'))) {
+                    teachers.shift();
+                }
+            } else if (file.name.endsWith('.json')) {
+                const data = JSON.parse(text);
+                if (Array.isArray(data) && data.every(item => typeof item === 'string')) {
+                    teachers = data;
+                } else {
+                    throw new Error("Format JSON tidak valid. Harusnya berupa array of strings. Contoh: [\"Guru A\", \"Guru B\"]");
+                }
+            } else {
+                throw new Error("Format file tidak didukung. Gunakan .csv atau .json.");
+            }
+            
+            if (teachers.length > 0) {
+                onAddTeachers(teachers);
+            } else {
+                throw new Error("Tidak ada nama guru yang ditemukan dalam file.");
+            }
+
+        } catch (err) {
+            console.error("Import failed:", err);
+            alert(`Gagal mengimpor file: ${(err as Error).message}`);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset file input
+  };
+
 
   if (!isOpen) return null;
 
   const renderContent = () => {
     switch(activeTab) {
-        case 'performance':
-            return (
-                <iframe
-                    srcDoc={reportHtml}
-                    title="Laporan Kinerja Guru"
-                    className="w-full h-full border-0"
-                />
+        case 'performanceReport':
+             return (
+                <div className="w-full h-full bg-gray-200">
+                    <iframe
+                        srcDoc={reportHtml}
+                        title="Laporan Kinerja Guru"
+                        className="w-full h-full border-0 rounded-md"
+                        sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+                    />
+                </div>
             );
         case 'tracking':
             return (
@@ -1481,7 +1530,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     </div>
                 </div>
             );
-        case 'backup':
+        case 'dataManagement':
             return (
                  <div>
                     <h3 className="text-lg font-semibold mb-4">Backup & Restore Data</h3>
@@ -1505,6 +1554,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             />
                         </div>
                     </div>
+                    <div className="mt-8 pt-8 border-t border-gray-200">
+                        <h3 className="text-lg font-semibold mb-4">Impor Data Guru</h3>
+                        <div className="p-4 border rounded-lg bg-blue-50 text-blue-800 mb-6">
+                            <p><strong>Impor daftar guru secara massal dari file CSV atau JSON.</strong></p>
+                            <p className="mt-2 text-sm">
+                                <strong>Format CSV:</strong> Satu kolom berisi nama guru, satu nama per baris. Header opsional.<br/>
+                                <code className="text-xs block bg-blue-100 p-1 rounded mt-1">
+                                    Nama Guru<br/>
+                                    Andi Wijaya, S.Pd.<br/>
+                                    Budi Santoso, M.Pd.<br/>
+                                </code>
+                            </p>
+                            <p className="mt-2 text-sm">
+                                <strong>Format JSON:</strong> Array berisi string nama guru.<br/>
+                                <code className="text-xs block bg-blue-100 p-1 rounded mt-1">["Andi Wijaya, S.Pd.", "Budi Santoso, M.Pd."]</code>
+                            </p>
+                        </div>
+                        <input
+                            type="file"
+                            accept=".csv,.json"
+                            onChange={handleFileImport}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        />
+                    </div>
                 </div>
             );
     }
@@ -1525,18 +1598,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
         <div className="mb-6 flex-shrink-0">
             <div className="bg-gray-100 p-1.5 rounded-xl flex items-center justify-center space-x-2">
-                <button
-                    onClick={() => setActiveTab('performance')}
+                 <button
+                    onClick={() => setActiveTab('performanceReport')}
                     className={`flex items-center justify-center w-full px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
-                        activeTab === 'performance'
+                        activeTab === 'performanceReport'
                             ? 'bg-white text-indigo-700 shadow-md'
                             : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-700'
                     }`}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
-                      <path d="M12 2.252A8.014 8.014 0 0117.748 12H12V2.252z" />
-                    </svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z" />
+                     </svg>
                     <span>Raport Kinerja Guru</span>
                 </button>
                 <button
@@ -1553,9 +1625,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     <span>Pelacakan Pengguna</span>
                 </button>
                 <button
-                    onClick={() => setActiveTab('backup')}
+                    onClick={() => setActiveTab('dataManagement')}
                     className={`flex items-center justify-center w-full px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
-                        activeTab === 'backup'
+                        activeTab === 'dataManagement'
                             ? 'bg-white text-indigo-700 shadow-md'
                             : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-700'
                     }`}
