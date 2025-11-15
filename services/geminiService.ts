@@ -5,7 +5,7 @@ import { ARABIC_SUBJECTS } from "../constants";
 let ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -87,15 +87,16 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         1.  **Analisis CP, TP, dan ATP**: Buat tabel ATP yang runut.
         2.  **Program Tahunan (Prota)**: Buat tabel Prota.
         3.  **Program Semester (Promes)**: Buat tabel Promes.
-        4.  **${formData.jumlah_modul_ajar} Modul Ajar**: Buat modul ajar lengkap sesuai jumlah yang diminta.
+        4.  **${formData.jumlah_modul_ajar} Modul Ajar**: Buat modul ajar lengkap. **Setiap bagian dari modul ajar (misalnya, Informasi Umum, Komponen Inti, Lampiran) harus disajikan dalam format tabel yang jelas dan terstruktur.**
         5.  **KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)**: Buat tabel KKTP.
         6.  **Jurnal Harian Guru**: Buat format tabel jurnal harian yang siap diisi.
 
-        **Aturan Format:**
+        **Aturan Format PENTING:**
+        - **SELURUH KONTEN** untuk setiap bagian harus disajikan di dalam tag '<table>'. Gunakan struktur tabel (<table>, <thead>, <tbody>, <tr>, <th>, <td>) secara ekstensif untuk menyajikan semua informasi agar terlihat rapi dan terstruktur. Hindari penggunaan paragraf <p> atau daftar <ul>/<li> di luar tabel.
         - Root object harus memiliki properti "sections" yang berisi array.
         - Setiap objek section harus memiliki: "id" (string unik, misal "atp"), "title" (string, misal "Analisis CP, TP, dan ATP"), "content" (string HTML).
-        - Gunakan tag HTML standar untuk format (<table>, <thead>, <tbody>, <tr>, <th>, <td>, <h3>, <p>, <ul>, <li>).
-        - Untuk bahasa Arab, gunakan <p style="text-align:right; direction:rtl;">.
+        - **Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
+        - Untuk bahasa Arab, gunakan <p style='text-align:right; direction:rtl;'> di dalam sel tabel (<td>).
         `,
         config: {
             responseMimeType: 'application/json',
@@ -114,51 +115,51 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
     const isArabicContext = ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase());
 
     const headerContent = formData.jenjang === 'Pesantren'
-        ? `<div style="text-align: center;"><img src="${PESANTREN_HEADER_IMAGE_BASE64}" alt="Kop Surat Pesantren" style="width: 100%; max-width: 700px; margin: 0 auto;"/></div>`
+        ? `<div style='text-align: center;'><img src='${PESANTREN_HEADER_IMAGE_BASE64}' alt='Kop Surat Pesantren' style='width: 100%; max-width: 700px; margin: 0 auto;'/></div>`
         : `
-        <div style="text-align: center; font-family: 'Times New Roman', serif; border-bottom: 3px solid black; padding-bottom: 5px; margin-bottom: 10px;">
-            ${formData.logo_sekolah ? `<img src="${formData.logo_sekolah}" alt="logo" style="width: 80px; height: auto; position: absolute; left: 20px;">` : ''}
-            <h3 style="margin: 0; font-size: 14pt; font-weight: bold;">${formData.yayasan || ''}</h3>
-            <h2 style="margin: 0; font-size: 18pt; font-weight: bold;">${formData.sekolah}</h2>
-            <p style="margin: 0; font-size: 10pt;">${formData.alamat_sekolah || ''}</p>
+        <div style='text-align: center; font-family: Times New Roman, serif; border-bottom: 3px solid black; padding-bottom: 5px; margin-bottom: 10px;'>
+            ${formData.logo_sekolah ? `<img src='${formData.logo_sekolah}' alt='logo' style='width: 80px; height: auto; position: absolute; left: 20px;'>` : ''}
+            <h3 style='margin: 0; font-size: 14pt; font-weight: bold;'>${formData.yayasan || ''}</h3>
+            <h2 style='margin: 0; font-size: 18pt; font-weight: bold;'>${formData.sekolah}</h2>
+            <p style='margin: 0; font-size: 10pt;'>${formData.alamat_sekolah || ''}</p>
         </div>
-        <h3 style="text-align: center; font-family: 'Times New Roman', serif; font-weight: bold; margin-top: 20px;">${formData.judul_asesmen || ''}</h3>
-        <table style="width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; margin-top: 15px; font-size: 11pt;">
+        <h3 style='text-align: center; font-family: Times New Roman, serif; font-weight: bold; margin-top: 20px;'>${formData.judul_asesmen || ''}</h3>
+        <table style='width: 100%; border-collapse: collapse; font-family: Times New Roman, serif; margin-top: 15px; font-size: 11pt;'>
             <tbody>
                 <tr>
-                    <td style="border: none; padding: 2px; width: 15%;">Mata Pelajaran</td>
-                    <td style="border: none; padding: 2px; width: 2%;">:</td>
-                    <td style="border: none; padding: 2px; width: 33%;">${formData.mata_pelajaran}</td>
-                    <td style="border: none; padding: 2px; width: 15%;">Tanggal</td>
-                    <td style="border: none; padding: 2px; width: 2%;">:</td>
-                    <td style="border: none; padding: 2px; width: 33%;">${formData.tanggal_ujian || ''}</td>
+                    <td style='border: none; padding: 2px; width: 15%;'>Mata Pelajaran</td>
+                    <td style='border: none; padding: 2px; width: 2%;'>:</td>
+                    <td style='border: none; padding: 2px; width: 33%;'>${formData.mata_pelajaran}</td>
+                    <td style='border: none; padding: 2px; width: 15%;'>Tanggal</td>
+                    <td style='border: none; padding: 2px; width: 2%;'>:</td>
+                    <td style='border: none; padding: 2px; width: 33%;'>${formData.tanggal_ujian || ''}</td>
                 </tr>
                 <tr>
-                    <td style="border: none; padding: 2px;">Kelas/Semester</td>
-                    <td style="border: none; padding: 2px;">:</td>
-                    <td style="border: none; padding: 2px;">${formData.kelas} / ${formData.semester === '1' ? 'Ganjil' : 'Genap'}</td>
-                    <td style="border: none; padding: 2px;">Jam Ke-</td>
-                    <td style="border: none; padding: 2px;">:</td>
-                    <td style="border: none; padding: 2px;">${formData.jam_ke || ''}</td>
+                    <td style='border: none; padding: 2px;'>Kelas/Semester</td>
+                    <td style='border: none; padding: 2px;'>:</td>
+                    <td style='border: none; padding: 2px;'>${formData.kelas} / ${formData.semester === '1' ? 'Ganjil' : 'Genap'}</td>
+                    <td style='border: none; padding: 2px;'>Jam Ke-</td>
+                    <td style='border: none; padding: 2px;'>:</td>
+                    <td style='border: none; padding: 2px;'>${formData.jam_ke || ''}</td>
                 </tr>
                  <tr>
-                    <td style="border: none; padding: 2px;">Tahun Ajaran</td>
-                    <td style="border: none; padding: 2px;">:</td>
-                    <td style="border: none; padding: 2px;">${formData.tahun_ajaran}</td>
-                    <td style="border: none; padding: 2px;">Waktu</td>
-                    <td style="border: none; padding: 2px;">:</td>
-                    <td style="border: none; padding: 2px;">${formData.waktu_ujian || ''}</td>
+                    <td style='border: none; padding: 2px;'>Tahun Ajaran</td>
+                    <td style='border: none; padding: 2px;'>:</td>
+                    <td style='border: none; padding: 2px;'>${formData.tahun_ajaran}</td>
+                    <td style='border: none; padding: 2px;'>Waktu</td>
+                    <td style='border: none; padding: 2px;'>:</td>
+                    <td style='border: none; padding: 2px;'>${formData.waktu_ujian || ''}</td>
                 </tr>
             </tbody>
         </table>
         `;
     
     const signatureBlock = `
-        <div style="margin-top: 40px; overflow: auto;">
-            <div style="float: right; text-align: center; width: 250px;">
+        <div style='margin-top: 40px; overflow: auto;'>
+            <div style='float: right; text-align: center; width: 250px;'>
                 <p>Guru Mata Pelajaran</p>
                 <br/><br/><br/>
-                <p style="font-weight: bold; text-decoration: underline;">${formData.nama_guru}</p>
+                <p style='font-weight: bold; text-decoration: underline;'>${formData.nama_guru}</p>
             </div>
         </div>
     `;
@@ -268,7 +269,8 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         - Untuk Naskah Soal, sertakan header ujian yang sudah disediakan di awal kontennya.
         - Untuk SEMUA DOKUMEN LAINNYA (selain Naskah Soal), sertakan blok tanda tangan guru di akhir kontennya.
         - Gunakan tag HTML standar. Untuk soal pilihan ganda, gunakan format <ol type='A'>.
-        - Untuk bahasa Arab, pastikan teks rata kanan dan arah RTL. Gunakan <div dir="rtl" style="text-align: right;"> untuk membungkus konten Arab.
+        - **PENTING: Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
+        - Untuk bahasa Arab, pastikan teks rata kanan dan arah RTL. Gunakan <div dir='rtl' style='text-align: right;'> untuk membungkus konten Arab.
         
         **Header Ujian (untuk Naskah Soal):**
         \`\`\`html
@@ -327,14 +329,15 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
         3.  **Konten Slide Presentasi (PPT)**:
             - Buat bagian khusus yang diawali dengan: \`<!-- SLIDE_CONTENT_START -->\` dan diakhiri dengan \`<!-- SLIDE_CONTENT_END -->\`.
             - Di dalam blok ini, generate konten untuk slide presentasi. Gunakan format berikut untuk setiap slide:
-                - \`<div class="ppt-slide">\`
-                - \`<h4 class="slide-title">Judul Slide</h4>\`
-                - \`<div class="slide-content">Konten slide di sini (bisa berupa poin-poin dalam <ul><li>...</li></ul> atau paragraf).</div>\`
+                - \`<div class='ppt-slide'>\`
+                - \`<h4 class='slide-title'>Judul Slide</h4>\`
+                - \`<div class='slide-content'>Konten slide di sini (bisa berupa poin-poin dalam <ul><li>...</li></ul> atau paragraf).</div>\`
                 - \`</div>\`
             - Pastikan untuk membuat beberapa slide yang mencakup ringkasan dari semua pertemuan.
 
         **Aturan Penting:**
         - Gunakan tag HTML standar (<h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <strong>).
+        - **PENTING: Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
         - Pastikan seluruh output adalah satu string HTML yang valid di dalam properti "content".
         `,
         config: {
@@ -426,7 +429,7 @@ export const generateCombinedContent = async (formData: FormData, textContent: s
            - **Analisis CP, TP, dan ATP**: Buat tabel ATP yang runut.
            - **Program Tahunan (Prota)**: Buat tabel Prota.
            - **Program Semester (Promes)**: Buat tabel Promes.
-           - **PENTING: Buat 5 (LIMA) buah Modul Ajar yang berbeda dan lengkap.** Setiap modul harus mencakup komponen seperti Tujuan Pembelajaran, Kegiatan Pembelajaran (Pendahuluan, Inti, Penutup), dan Asesmen.
+           - **PENTING: Buat 5 (LIMA) buah Modul Ajar yang berbeda dan lengkap.** Setiap modul harus mencakup komponen seperti Tujuan Pembelajaran, Kegiatan Pembelajaran (Pendahuluan, Inti, Penutup), dan Asesmen. **Setiap bagian dari modul ajar harus disajikan dalam format tabel yang jelas.**
            - **KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)**: Buat tabel KKTP.
            - **Jurnal Harian Guru**: Buat format tabel jurnal harian yang siap diisi.
 
@@ -438,12 +441,13 @@ export const generateCombinedContent = async (formData: FormData, textContent: s
            - **Rubrik Penilaian**: Sediakan rubrik penilaian yang jelas untuk soal uraian.
            - **Ringkasan Materi**: Buat ringkasan materi dari teks buku ajar yang diberikan.
 
-        **Aturan Format Output:**
+        **Aturan Format Output PENTING:**
+        - **Untuk "administrasi_guru", SELURUH KONTEN** untuk setiap bagian harus disajikan di dalam tag '<table>'. Gunakan struktur tabel (<table>, <thead>, <tbody>, <tr>, <th>, <td>) secara ekstensif untuk menyajikan semua informasi agar terlihat rapi dan terstruktur. Hindari penggunaan paragraf <p> atau daftar <ul>/<li> di luar tabel.
         - Sajikan seluruh output dalam format JSON sesuai skema yang diberikan.
         - JSON harus memiliki dua properti utama: "administrasi_guru" dan "bank_soal".
         - Setiap properti harus berisi array dari objek-objek section.
         - Setiap objek section harus memiliki: "id" (string unik), "title" (string), dan "content" (string dalam format HTML).
-        - Gunakan tag HTML standar (<table>, <h3>, <p>, <ul>, <li>, dll.) untuk konten.
+        - **Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
         `,
         config: {
             responseMimeType: 'application/json',

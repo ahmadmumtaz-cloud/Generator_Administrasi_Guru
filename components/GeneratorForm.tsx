@@ -12,6 +12,19 @@ interface GeneratorFormProps {
   generationProgress: number;
 }
 
+const PESANTREN_INSTRUCTION_OPTIONS = [
+    { value: "أجب عن الأسئلة الآتية!", text: "Jawablah pertanyaan berikut!" },
+    { value: "اختر الإجابة الصحيحة مما بين القوسين!", text: "Pilihlah jawaban yang benar!" },
+    { value: "املأ الفراغات بالكلمة المناسبة!", text: "Isilah titik-titik dengan kata yang sesuai!" },
+    { value: "ترجم هذه الجمل إلى اللغة الإندونيسية!", text: "Terjemahkan ke Bahasa Indonesia!" },
+    { value: "ترجم هذه الجمل إلى اللغة العربية!", text: "Terjemahkan ke Bahasa Arab!" },
+    { value: "أعرب الكلمات التي تحتها خط!", text: "I'rab-lah kata yang bergaris bawah!" },
+    { value: "كوّن جملا مفيدة من الكلمات الآتية!", text: "Buatlah kalimat dari kata-kata berikut!" },
+    { value: "غير الفعل في الجملة الآتية!", text: "Ubahlah fi'il dalam kalimat berikut!" },
+    { value: "custom", text: "Instruksi Lainnya..." },
+];
+
+
 const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack, onShowAIAssistant, isLoading, generationProgress }) => {
   const [formData, setFormData] = useState<FormData>(() => {
     const defaultData: FormData = {
@@ -157,7 +170,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     const newSection: SoalPesantrenSection = {
         id: `section_${Date.now()}`,
         letter: 'Alif',
-        instruction: '',
+        instruction: PESANTREN_INSTRUCTION_OPTIONS[0].value,
         count: 5,
     };
     setFormData(prev => ({
@@ -325,47 +338,76 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                 <button type="button" onClick={() => onShowAIAssistant(formData, 'topic')} className="text-sm text-blue-600 font-semibold hover:underline">✨ Dapatkan saran dari AI Asisten</button>
                 <input type="number" id="jumlah_soal_total" name="jumlah_soal_total" value={formData.jumlah_soal_total} onChange={handleChange} className={formElementClasses} placeholder="Total Soal Standar (untuk validasi)"/>
                 
-                <div className="p-4 bg-gray-50 border rounded-lg space-y-4">
-                  <h3 className="font-semibold text-gray-800">Pembangun Bagian Soal (Berbahasa Arab)</h3>
-                  {(formData.soal_pesantren_sections || []).map((section, index) => (
-                      <div key={section.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center p-2 border-b">
-                          <div className="md:col-span-2">
-                              <select 
-                                value={section.letter} 
-                                onChange={(e) => handlePesantrenSectionChange(section.id, 'letter', e.target.value)}
-                                className={formElementClasses}
-                              >
-                                {PESANTREN_SOAL_LETTERS.map(l => <option key={l} value={l}>{l}</option>)}
-                              </select>
-                          </div>
-                          <div className="md:col-span-6">
-                               <input 
-                                type="text" 
-                                value={section.instruction}
-                                placeholder="اكتب الأمر هنا... (Contoh: أجب عن الأسئلة الآتية)"
-                                onChange={(e) => handlePesantrenSectionChange(section.id, 'instruction', e.target.value)}
-                                className={`${formElementClasses} arabic-font-preview`}
-                                style={{textAlign: 'right'}}
-                                required
-                               />
-                          </div>
-                          <div className="md:col-span-2">
-                              <input 
-                                type="number"
-                                value={section.count}
-                                min="1"
-                                placeholder="Jumlah Soal"
-                                onChange={(e) => handlePesantrenSectionChange(section.id, 'count', parseInt(e.target.value, 10))}
-                                className={formElementClasses}
-                                required
-                              />
-                          </div>
-                          <div className="md:col-span-2 flex justify-end">
-                              <button type="button" onClick={() => removePesantrenSection(section.id)} className="text-red-500 hover:text-red-700 font-semibold">Hapus</button>
-                          </div>
-                      </div>
-                  ))}
-                  <button type="button" onClick={addPesantrenSection} className="w-full mt-2 px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-md hover:bg-blue-200">+ Tambah Bagian Soal</button>
+                <div className="p-4 bg-gray-50 border rounded-lg space-y-3">
+                    <h3 className="font-semibold text-gray-800">Pembangun Bagian Soal (Berbahasa Arab)</h3>
+                    {(formData.soal_pesantren_sections || []).map((section) => {
+                        const isCustomInstruction = !PESANTREN_INSTRUCTION_OPTIONS.some(opt => opt.value === section.instruction);
+                        return (
+                            <div key={section.id} className="flex flex-col md:flex-row items-center gap-3 p-3 bg-white rounded-lg border shadow-sm">
+                                <select
+                                    value={section.letter}
+                                    onChange={(e) => handlePesantrenSectionChange(section.id, 'letter', e.target.value)}
+                                    className={`${formElementClasses} w-full md:w-auto font-mono`}
+                                >
+                                    {PESANTREN_SOAL_LETTERS.map(l => <option key={l} value={l}>{l}</option>)}
+                                </select>
+
+                                <div className="flex-grow w-full">
+                                    <select
+                                        value={isCustomInstruction ? 'custom' : section.instruction}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            handlePesantrenSectionChange(section.id, 'instruction', value === 'custom' ? '' : value);
+                                        }}
+                                        className={`${formElementClasses} w-full`}
+                                    >
+                                        {PESANTREN_INSTRUCTION_OPTIONS.map(opt => (
+                                            <option key={opt.value} value={opt.value}>
+                                                {opt.text} {opt.value !== 'custom' && `— ${opt.value}`}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    {isCustomInstruction && (
+                                        <input
+                                            type="text"
+                                            value={section.instruction}
+                                            placeholder="اكتب الأمر هنا..."
+                                            onChange={(e) => handlePesantrenSectionChange(section.id, 'instruction', e.target.value)}
+                                            className={`mt-2 ${formElementClasses} arabic-font-preview w-full`}
+                                            style={{ textAlign: 'right' }}
+                                            required
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-2 w-full md:w-auto">
+                                    <label htmlFor={`count-${section.id}`} className="text-sm font-medium text-gray-600">Jumlah:</label>
+                                    <input
+                                        id={`count-${section.id}`}
+                                        type="number"
+                                        value={section.count}
+                                        min="1"
+                                        onChange={(e) => handlePesantrenSectionChange(section.id, 'count', parseInt(e.target.value, 10) || 1)}
+                                        className={`${formElementClasses} w-20 text-center`}
+                                        required
+                                    />
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => removePesantrenSection(section.id)}
+                                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
+                                    title="Hapus Bagian"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        )
+                    })}
+                    <button type="button" onClick={addPesantrenSection} className="w-full mt-2 px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-md hover:bg-blue-200">+ Tambah Bagian Soal</button>
                 </div>
 
                 {totalSoalError && <p className="text-sm text-red-600">{totalSoalError}</p>}

@@ -56,7 +56,7 @@ export const ARABIC_SUBJECTS = [
 // Base subjects for each level
 const sdSubjects = ['Bahasa Indonesia', 'Matematika', 'IPA', 'IPS', 'PPKn', 'Bahasa Inggris', 'PJOK', 'Seni Budaya', 'Prakarya', 'PAI dan Budi Pekerti'];
 const smpSubjects = ['Bahasa Indonesia', 'Matematika', 'IPA', 'IPS', 'PPKn', 'Bahasa Inggris', 'PJOK', 'Seni Budaya', 'Prakarya', 'Bahasa Daerah'];
-const smaSubjects = ['Bahasa Indonesia', 'Matematika', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sejarah', 'Sosiologi', 'PPKn', 'Bahasa Inggris', 'Informatika', 'PJOK', 'Seni Budaya', 'Prakarya'];
+const smaSubjects = ['Bahasa Indonesia', 'Matematika', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sejarah', 'Sosiologi', 'PPKn', 'Bahasa Inggris', 'Informatika', 'Koding dan Kecerdasan Artifisial (KKA)', 'PJOK', 'Seni Budaya', 'Prakarya'];
 
 
 export const MATA_PELAJARAN_OPTIONS: Record<string, string[]> = {
