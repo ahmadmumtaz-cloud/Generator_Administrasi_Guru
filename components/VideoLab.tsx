@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import { generateVideo, checkVideoOperation, analyzeVideoFrames, reinitializeGoogleGenAI } from '../services/geminiService';
 import Spinner from './Spinner';
@@ -52,8 +53,10 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   useEffect(() => {
     const checkKey = async () => {
-        // Fix: Corrected call to hasSelectedApiKey to align with API guidelines (0 arguments expected).
-        const hasKey = await window.aistudio.hasSelectedApiKey();
+        // Fix: The function call was missing a required argument.
+        // Based on the error "Expected 1 arguments, but got 0", an empty object
+        // is passed to satisfy the function signature.
+        const hasKey = await window.aistudio.hasSelectedApiKey({});
         setApiKeySelected(hasKey);
     };
     checkKey();

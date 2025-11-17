@@ -1,6 +1,8 @@
 
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { GoogleGenAI, LiveSession, LiveServerMessage, Modality, Blob } from '@google/genai';
+// Fix: Removed 'LiveSession' as it is not an exported member of the module.
+import { GoogleGenAI, LiveServerMessage, Modality, Blob } from '@google/genai';
 import Spinner from './Spinner';
 
 // Audio helper functions
@@ -48,7 +50,9 @@ const AudioLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [connectionState, setConnectionState] = useState<ConnectionState>('idle');
   const [transcription, setTranscription] = useState<string[]>([]);
   const [isMuted, setIsMuted] = useState(false);
-  const sessionPromiseRef = useRef<Promise<LiveSession> | null>(null);
+  // Fix: Replaced the non-exported 'LiveSession' type with a type-safe inferred type
+  // using ReturnType to ensure the ref matches the return value of `ai.live.connect`.
+  const sessionPromiseRef = useRef<ReturnType<InstanceType<typeof GoogleGenAI>['live']['connect']> | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const inputAudioContextRef = useRef<AudioContext | null>(null);
   const outputAudioContextRef = useRef<AudioContext | null>(null);
