@@ -34,7 +34,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
       cp_elements: '', alokasi_waktu: '', jumlah_modul_ajar: 1,
       topik_materi: '', sertakan_kisi_kisi: true, sertakan_soal_tka: false,
       jumlah_soal_tka: 5, sertakan_soal_tka_uraian: false, jumlah_soal_tka_uraian: 3,
-      kelompok_tka: 'saintek', jumlah_soal_total: 20,
+      kelompok_tka: 'saintek',
       jenis_soal: ['Pilihan Ganda', 'Uraian'], jumlah_pg: 15, jumlah_uraian: 5,
       jumlah_isian_singkat: 0, 
       soal_pesantren_sections: [],
@@ -56,7 +56,28 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
   
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [showCustomSubject, setShowCustomSubject] = useState(false);
-  const [totalSoalError, setTotalSoalError] = useState<string | null>(null);
+  const [customMataPelajaran, setCustomMataPelajaran] = useState<Record<string, string[]>>({});
+  const [newSubject, setNewSubject] = useState('');
+
+  useEffect(() => {
+    try {
+        const savedCustomSubjects = localStorage.getItem('customMataPelajaran');
+        if (savedCustomSubjects) {
+            setCustomMataPelajaran(JSON.parse(savedCustomSubjects));
+        }
+    } catch (error) {
+        console.error("Failed to load custom subjects from localStorage", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+        localStorage.setItem('customMataPelajaran', JSON.stringify(customMataPelajaran));
+    } catch (error) {
+        console.error("Failed to save custom subjects to localStorage", error);
+    }
+  }, [customMataPelajaran]);
+
 
   useEffect(() => {
     try {
@@ -75,7 +96,12 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
   useEffect(() => {
     if (formData.jenjang) {
       setKelasOptions(KELAS_OPTIONS[formData.jenjang] || []);
-      setMataPelajaranOptions(MATA_PELAJARAN_OPTIONS[formData.jenjang] || []);
+      
+      const baseSubjects = MATA_PELAJARAN_OPTIONS[formData.jenjang] || [];
+      const customSubjectsForJenjang = customMataPelajaran[formData.jenjang] || [];
+      const combinedSubjects = [...new Set([...baseSubjects, ...customSubjectsForJenjang])].sort();
+      setMataPelajaranOptions(combinedSubjects);
+      
       setAlokasiWaktuOptions(ALOKASI_WAKTU_OPTIONS[formData.jenjang] || []);
       
       const savedData = JSON.parse(localStorage.getItem('guruAppData') || '{}');
@@ -86,7 +112,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     } else {
       setKelasOptions([]); setMataPelajaranOptions([]); setAlokasiWaktuOptions([]);
     }
-  }, [formData.jenjang]);
+  }, [formData.jenjang, customMataPelajaran]);
   
   useEffect(() => {
     setLogoPreview(null);
@@ -105,32 +131,6 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     
     if (newFase !== formData.fase) setFormData(prev => ({ ...prev, fase: newFase }));
   }, [formData.jenjang, formData.kelas]);
-  
-  useEffect(() => {
-    if (module === 'soal') {
-      let total = 0;
-      if (formData.jenjang === 'Pesantren') {
-        total = (formData.soal_pesantren_sections || []).reduce((sum, section) => sum + (Number(section.count) || 0), 0);
-      } else {
-        const pgCount = formData.jenis_soal?.includes('Pilihan Ganda') ? (Number(formData.jumlah_pg) || 0) : 0;
-        const uraianCount = formData.jenis_soal?.includes('Uraian') ? (Number(formData.jumlah_uraian) || 0) : 0;
-        const isianCount = formData.jenis_soal?.includes('Isian Singkat') ? (Number(formData.jumlah_isian_singkat) || 0) : 0;
-        total = pgCount + uraianCount + isianCount;
-      }
-
-      if (total > (Number(formData.jumlah_soal_total) || 0)) {
-        setTotalSoalError(`Jumlah soal per jenis (${total}) melebihi total soal standar (${formData.jumlah_soal_total}).`);
-      } else {
-        setTotalSoalError(null);
-      }
-    } else {
-      setTotalSoalError(null);
-    }
-  }, [
-    formData.jumlah_pg, formData.jumlah_uraian, formData.jumlah_isian_singkat,
-    formData.jumlah_soal_total, formData.jenis_soal, module, formData.jenjang,
-    formData.soal_pesantren_sections
-  ]);
 
   const [kelasOptions, setKelasOptions] = useState<string[]>([]);
   const [mataPelajaranOptions, setMataPelajaranOptions] = useState<string[]>([]);
@@ -150,7 +150,6 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     const value = e.target.value;
     if (value === 'custom') {
         setShowCustomSubject(true);
-        setFormData(prev => ({ ...prev, mata_pelajaran: ''}));
     } else {
         setShowCustomSubject(false);
         setFormData(prev => ({ ...prev, mata_pelajaran: value }));
@@ -209,9 +208,27 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     }
   };
 
+  const handleSaveNewSubject = () => {
+    const trimmedSubject = newSubject.trim();
+    if (trimmedSubject && formData.jenjang) {
+        setCustomMataPelajaran(prev => {
+            const subjectsForJenjang = prev[formData.jenjang] || [];
+            if (subjectsForJenjang.includes(trimmedSubject) || (MATA_PELAJARAN_OPTIONS[formData.jenjang] || []).includes(trimmedSubject)) {
+                return prev;
+            }
+            return {
+                ...prev,
+                [formData.jenjang]: [...subjectsForJenjang, trimmedSubject],
+            };
+        });
+        setFormData(prev => ({ ...prev, mata_pelajaran: trimmedSubject }));
+        setShowCustomSubject(false);
+        setNewSubject('');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if(totalSoalError) return;
     onSubmit(formData);
   };
 
@@ -223,7 +240,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     : 'Lengkapi form untuk menghasilkan silabus, materi, latihan, dan slide presentasi untuk e-course Anda.';
   const formElementClasses = "w-full rounded-md border-2 border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 ease-in-out";
 
-  const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase());
+  const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase().replace(/'|\\/g, ''));
   const showPesantrenDynamicForm = module === 'soal' && formData.jenjang === 'Pesantren' && isArabicContext;
 
   return (
@@ -239,10 +256,30 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
         <div className="grid md:grid-cols-4 gap-6">
           <select id="jenjang" name="jenjang" value={formData.jenjang} onChange={handleChange} required className={formElementClasses} aria-label="Jenjang"><option value="">Pilih Jenjang</option><option>SD</option><option>MI</option><option>SMP</option><option>MTS</option><option>SMA</option><option>MA</option><option>Pesantren</option></select>
           <select id="kelas" name="kelas" value={formData.kelas} onChange={handleChange} required disabled={!formData.jenjang} className={`${formElementClasses} disabled:bg-gray-100`} aria-label="Kelas"><option value="">Pilih Kelas</option>{kelasOptions.map(k => <option key={k} value={k}>{k}</option>)}</select>
-          <select id="mata_pelajaran_select" name="mata_pelajaran_select" value={showCustomSubject ? 'custom' : formData.mata_pelajaran} onChange={handleSubjectChange} required disabled={!formData.jenjang} className={`${formElementClasses} disabled:bg-gray-100`} aria-label="Mata Pelajaran"><option value="">Pilih Mapel</option>{mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}<option value="custom">Lainnya...</option></select>
+          <select id="mata_pelajaran_select" name="mata_pelajaran_select" value={showCustomSubject ? 'custom' : formData.mata_pelajaran} onChange={handleSubjectChange} required disabled={!formData.jenjang} className={`${formElementClasses} disabled:bg-gray-100`} aria-label="Mata Pelajaran"><option value="">Pilih Mapel</option>{mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}<option value="custom">Lainnya (Tambah Baru)...</option></select>
           <select id="bahasa" name="bahasa" value={formData.bahasa} onChange={handleChange} className={formElementClasses} aria-label="Bahasa"><option>Bahasa Indonesia</option><option>Bahasa Inggris</option><option>Bahasa Sunda</option><option>Bahasa Arab</option></select>
         </div>
-        {showCustomSubject && <input type="text" id="mata_pelajaran" name="mata_pelajaran" value={formData.mata_pelajaran} onChange={handleChange} required className={`mt-1 block ${formElementClasses}`} placeholder="Tulis nama mata pelajaran..."/>}
+        {showCustomSubject && (
+            <div className="flex items-center space-x-2 mt-2">
+                <input
+                    type="text"
+                    id="new_subject_input"
+                    value={newSubject}
+                    onChange={(e) => setNewSubject(e.target.value)}
+                    className={`flex-grow ${formElementClasses}`}
+                    placeholder="Tulis nama mapel baru..."
+                    aria-label="Mata Pelajaran Baru"
+                />
+                <button
+                    type="button"
+                    onClick={handleSaveNewSubject}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300"
+                    disabled={!newSubject.trim()}
+                >
+                    Simpan
+                </button>
+            </div>
+        )}
         <div className="grid md:grid-cols-2 gap-6">
             <select id="semester" name="semester" value={formData.semester} onChange={handleChange} required className={formElementClasses} aria-label="Semester">
                 <option value="1">Semester 1 (Ganjil)</option>
@@ -282,14 +319,12 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
            <div className="space-y-6">
                 <textarea id="topik_materi" name="topik_materi" value={formData.topik_materi ?? ''} onChange={handleChange} required rows={3} className={formElementClasses} placeholder="Topik / Materi..."></textarea>
                 <button type="button" onClick={() => onShowAIAssistant(formData, 'topic')} className="text-sm text-blue-600 font-semibold hover:underline">✨ Dapatkan saran dari AI Asisten</button>
-                <input type="number" id="jumlah_soal_total" name="jumlah_soal_total" value={formData.jumlah_soal_total} onChange={handleChange} className={formElementClasses} placeholder="Total Soal Standar"/>
                 <div className="flex space-x-4"><label><input type="checkbox" name="Pilihan Ganda" checked={formData.jenis_soal?.includes('Pilihan Ganda')} onChange={handleCheckboxChange}/> PG</label><label><input type="checkbox" name="Uraian" checked={formData.jenis_soal?.includes('Uraian')} onChange={handleCheckboxChange}/> Uraian</label><label><input type="checkbox" name="Isian Singkat" checked={formData.jenis_soal?.includes('Isian Singkat')} onChange={handleCheckboxChange}/> Isian</label></div>
                 <div className="grid md:grid-cols-3 gap-6">
                     {formData.jenis_soal?.includes('Pilihan Ganda') && <input type="number" name="jumlah_pg" value={formData.jumlah_pg} onChange={handleChange} className={formElementClasses} placeholder="Jumlah PG" />}
                     {formData.jenis_soal?.includes('Uraian') && <input type="number" name="jumlah_uraian" value={formData.jumlah_uraian} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Uraian" />}
                     {formData.jenis_soal?.includes('Isian Singkat') && <input type="number" name="jumlah_isian_singkat" value={formData.jumlah_isian_singkat} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Isian" />}
                 </div>
-                 {totalSoalError && <p className="text-sm text-red-600">{totalSoalError}</p>}
                 {['SMA', 'MA'].includes(formData.jenjang) && (
                   <div className="p-4 bg-indigo-50 border rounded-lg space-y-4">
                     <div className="flex flex-col sm:flex-row sm:space-x-6">
@@ -336,7 +371,6 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
             <div className="space-y-6">
                 <textarea id="topik_materi" name="topik_materi" value={formData.topik_materi ?? ''} onChange={handleChange} required rows={3} className={formElementClasses} placeholder="Topik / Materi (contoh: I'rab, Tashrif, Adad Ma'dud)..."></textarea>
                 <button type="button" onClick={() => onShowAIAssistant(formData, 'topic')} className="text-sm text-blue-600 font-semibold hover:underline">✨ Dapatkan saran dari AI Asisten</button>
-                <input type="number" id="jumlah_soal_total" name="jumlah_soal_total" value={formData.jumlah_soal_total} onChange={handleChange} className={formElementClasses} placeholder="Total Soal Standar (untuk validasi)"/>
                 
                 <div className="p-4 bg-gray-50 border rounded-lg space-y-3">
                     <h3 className="font-semibold text-gray-800">Pembangun Bagian Soal (Berbahasa Arab)</h3>
@@ -410,7 +444,6 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                     <button type="button" onClick={addPesantrenSection} className="w-full mt-2 px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-md hover:bg-blue-200">+ Tambah Bagian Soal</button>
                 </div>
 
-                {totalSoalError && <p className="text-sm text-red-600">{totalSoalError}</p>}
                 
                 <div className="grid md:grid-cols-2 gap-6">
                     <select name="tingkat_kesulitan" value={formData.tingkat_kesulitan} onChange={handleChange} className={formElementClasses}><option>Mudah</option><option>Sedang</option><option>Sulit (HOTS)</option></select>
@@ -440,7 +473,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
 
         {isLoading && <div className="my-4"><div className="flex justify-between mb-1"><span className="font-medium text-indigo-700">AI Sedang Bekerja...</span><span className="font-medium text-indigo-700">{Math.round(generationProgress)}%</span></div><div className="w-full bg-gray-200 rounded-full h-2.5"><div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${generationProgress}%` }}></div></div></div>}
         <div className="flex justify-end pt-2">
-            <button type="submit" disabled={isLoading || !!totalSoalError} className="inline-flex items-center justify-center px-6 py-2 border rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
+            <button type="submit" disabled={isLoading} className="inline-flex items-center justify-center px-6 py-2 border rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
                 {isLoading ? <><Spinner /><span className="ml-2">Generating...</span></> : 'Generate Perangkat'}
             </button>
         </div>

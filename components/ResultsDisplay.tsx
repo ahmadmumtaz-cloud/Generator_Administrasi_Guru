@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { GeneratedSection, Module, FormData } from '../types';
 import { ARABIC_SUBJECTS } from '../constants';
 import { textToSpeech } from '../services/geminiService';
 
 const downloadDoc = (fileName: string, content: string, formData: FormData | null) => {
-    const isArabicContext = formData?.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData?.mata_pelajaran || '');
+    const isArabicContext = formData?.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData?.mata_pelajaran.toUpperCase().replace(/'|\\/g, '') || '');
 
     // Set a smaller font size to ensure content fits portrait legal paper
     const fontAndDirectionStyles = isArabicContext 
@@ -74,7 +73,7 @@ interface ResultsDisplayProps {
   module: Module;
   sections: GeneratedSection[];
   formData: FormData;
-  onUpdateSectionContent: (id: string, content: string) => void;
+  onUpdateSectionContent: (id: string, newContent: string) => void;
   onDeleteSection: (id: string) => void;
   onNewGeneration: () => void;
   onBack: () => void;
@@ -161,7 +160,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ module, sections, formD
   };
 
   const isAllSelected = sections.length > 0 && selectedSections.size === sections.length;
-  const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran);
 
   return (
     <div id="results-section" className="bg-white rounded-lg card-shadow p-6 fade-in">
@@ -181,7 +179,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ module, sections, formD
         <label className="inline-flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked={isAllSelected} onChange={handleSelectAll} className="h-5 w-5 rounded"/><span>{isAllSelected ? 'Hapus Pilihan' : 'Pilih Semua'}</span></label>
       </div>
 
-      <div id="generated-content" className={isArabicContext ? 'arabic-font-preview' : ''}>
+      <div id="generated-content">
         {sections.map(section => (
           <div key={section.id} className="flex items-start space-x-3 mb-4 group">
             <input type="checkbox" aria-label={`Pilih ${section.title}`} checked={selectedSections.has(section.id)} onChange={() => handleSelectionChange(section.id)} className="h-6 w-6 rounded mt-1"/>

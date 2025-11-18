@@ -8,18 +8,6 @@ interface DashboardProps {
 
 const modules = [
   {
-    id: 'pdf',
-    title: 'Generator Terpusat',
-    description: 'Salin teks dari PDF/dokumen buku ajar untuk hasilkan Administrasi Guru & Bank Soal sekaligus.',
-    icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-        </svg>
-    ),
-    color: 'indigo',
-    isFeatured: true,
-  },
-  {
     id: 'admin',
     title: 'Generator Administrasi Guru',
     description: 'ATP, Prota, Promes, Modul Ajar, KKTP, & Jurnal Harian.',
@@ -69,28 +57,6 @@ const modules = [
       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" /></svg>
     ),
     color: 'pink',
-  },
-  {
-    id: 'imageLab',
-    title: 'Studio Gambar AI',
-    description: 'Buat, edit, dan analisis gambar dengan AI.',
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-      </svg>
-    ),
-    color: 'purple',
-  },
-  {
-    id: 'videoLab',
-    title: 'Studio Video AI',
-    description: 'Buat video dari teks/gambar & analisis konten video.',
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 001.553.832l3-2a1 1 0 000-1.664l-3-2z" />
-      </svg>
-    ),
-    color: 'red',
   },
   {
     id: 'ebook',

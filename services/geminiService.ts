@@ -1,11 +1,11 @@
-import { GoogleGenAI, Modality, Type, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, Modality, Type, GenerateContentResponse, GenerateImagesResponse } from "@google/genai";
 import { FormData, GeneratedSection, GroundingSource } from "../types";
 import { ARABIC_SUBJECTS } from "../constants";
 
 let ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -28,7 +28,7 @@ const sectionsSchema = {
     required: ['sections'],
 };
 
-const withRetry = async <T>(fn: () => Promise<T>, retries = 4, delay = 2000): Promise<T> => {
+const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delay = 2000): Promise<T> => {
     try {
         return await fn();
     } catch (error: any) {
@@ -39,10 +39,6 @@ const withRetry = async <T>(fn: () => Promise<T>, retries = 4, delay = 2000): Pr
         }
         throw error;
     }
-};
-
-export const reinitializeGoogleGenAI = () => {
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
 export const getCPSuggestions = async (formData: Partial<FormData>): Promise<string> => {
@@ -96,7 +92,7 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         - Root object harus memiliki properti "sections" yang berisi array.
         - Setiap objek section harus memiliki: "id" (string unik, misal "atp"), "title" (string, misal "Analisis CP, TP, dan ATP"), "content" (string HTML).
         - **Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
-        - Untuk bahasa Arab, gunakan <p style='text-align:right; direction:rtl;'> di dalam sel tabel (<td>).
+        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab yang harus menggunakan atribut RTL. Judul bagian dan konten lain yang tidak berbahasa Arab HARUS TETAP LTR. Untuk konten Arab di dalam sel tabel, gunakan <p style='text-align:right; direction:rtl;'>.
         `,
         config: {
             responseMimeType: 'application/json',
@@ -112,8 +108,6 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
 };
 
 export const generateSoalContentSections = async (formData: FormData): Promise<GeneratedSection[]> => {
-    const isArabicContext = ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase());
-
     const headerContent = formData.jenjang === 'Pesantren'
         ? `<div style='text-align: center;'><img src='${PESANTREN_HEADER_IMAGE_BASE64}' alt='Kop Surat Pesantren' style='width: 100%; max-width: 700px; margin: 0 auto;'/></div>`
         : `
@@ -201,44 +195,58 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         return `${index + 1}. **${section.title}**: ${description}`;
     }).join('\n');
     
+    // --- START OF QUESTION COUNT LOGIC ---
     const pgInstructions = [];
-    if (formData.jenis_soal?.includes('Pilihan Ganda') && formData.jumlah_pg > 0) {
+    if (formData.jenis_soal?.includes('Pilihan Ganda') && (Number(formData.jumlah_pg) || 0) > 0) {
         pgInstructions.push(`${formData.jumlah_pg} soal pilihan ganda biasa`);
     }
-    if (formData.sertakan_soal_tka && formData.jumlah_soal_tka > 0) {
+    if (formData.sertakan_soal_tka && (Number(formData.jumlah_soal_tka) || 0) > 0) {
         pgInstructions.push(`${formData.jumlah_soal_tka} soal Pilihan Ganda level TKA (${formData.kelompok_tka})`);
     }
 
     const uraianInstructions = [];
-    if (formData.jenis_soal?.includes('Uraian') && formData.jumlah_uraian > 0) {
+    if (formData.jenis_soal?.includes('Uraian') && (Number(formData.jumlah_uraian) || 0) > 0) {
         uraianInstructions.push(`${formData.jumlah_uraian} soal uraian biasa`);
     }
-    if (formData.sertakan_soal_tka_uraian && formData.jumlah_soal_tka_uraian > 0) {
+    if (formData.sertakan_soal_tka_uraian && (Number(formData.jumlah_soal_tka_uraian) || 0) > 0) {
         uraianInstructions.push(`${formData.jumlah_soal_tka_uraian} soal Uraian level TKA (${formData.kelompok_tka})`);
     }
 
     const isianInstructions = [];
-    if (formData.jenis_soal?.includes('Isian Singkat') && formData.jumlah_isian_singkat > 0) {
+    if (formData.jenis_soal?.includes('Isian Singkat') && (Number(formData.jumlah_isian_singkat) || 0) > 0) {
         isianInstructions.push(`${formData.jumlah_isian_singkat} soal isian singkat`);
     }
 
+    const totalPg = (formData.jenis_soal?.includes('Pilihan Ganda') ? Number(formData.jumlah_pg) || 0 : 0) +
+                    (formData.sertakan_soal_tka ? Number(formData.jumlah_soal_tka) || 0 : 0);
+    const totalUraian = (formData.jenis_soal?.includes('Uraian') ? Number(formData.jumlah_uraian) || 0 : 0) +
+                        (formData.sertakan_soal_tka_uraian ? Number(formData.jumlah_soal_tka_uraian) || 0 : 0);
+    const totalIsian = formData.jenis_soal?.includes('Isian Singkat') ? Number(formData.jumlah_isian_singkat) || 0 : 0;
+    const grandTotal = totalPg + totalUraian + totalIsian;
+
     const soalStructureParts = [];
     if (pgInstructions.length > 0) {
-        soalStructureParts.push(`- Bagian Pilihan Ganda: Buat ${pgInstructions.join(' dan ')}. Gabungkan semua soal pilihan ganda dalam satu bagian berlabel "A. Pilihan Ganda" dengan penomoran yang berurutan.`);
+        soalStructureParts.push(`- Bagian Pilihan Ganda (Total ${totalPg} soal): Buat ${pgInstructions.join(' dan ')}. Gabungkan semua soal pilihan ganda dalam satu bagian berlabel "A. Pilihan Ganda" dengan penomoran yang berurutan.`);
     }
     if (uraianInstructions.length > 0) {
-        soalStructureParts.push(`- Bagian Uraian: Buat ${uraianInstructions.join(' dan ')}. Gabungkan semua soal uraian dalam satu bagian berlabel "B. Uraian" dengan penomoran yang berurutan, melanjutkan dari bagian sebelumnya.`);
+        soalStructureParts.push(`- Bagian Uraian (Total ${totalUraian} soal): Buat ${uraianInstructions.join(' dan ')}. Gabungkan semua soal uraian dalam satu bagian berlabel "B. Uraian" dengan penomoran yang berurutan, melanjutkan dari bagian sebelumnya.`);
     }
     if (isianInstructions.length > 0) {
-        soalStructureParts.push(`- Bagian Isian Singkat: Buat ${isianInstructions.join(' dan ')}. Gabungkan dalam satu bagian berlabel "C. Isian Singkat", melanjutkan penomoran dari bagian sebelumnya.`);
+        soalStructureParts.push(`- Bagian Isian Singkat (Total ${totalIsian} soal): Buat ${isianInstructions.join(' dan ')}. Gabungkan dalam satu bagian berlabel "C. Isian Singkat", melanjutkan penomoran dari bagian sebelumnya.`);
     }
 
+    const showPesantrenDynamicForm = (formData: FormData): boolean => {
+        const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase().replace(/'|\\/g, ''));
+        return formData.jenjang === 'Pesantren' && isArabicContext;
+    };
+    
     const soalStructurePrompt = showPesantrenDynamicForm(formData)
         ? (formData.soal_pesantren_sections || []).map(section => 
             `- Bagian ${section.letter}: Buat ${section.count} soal sesuai perintah: "${section.instruction}"`
           ).join('\n')
         : soalStructureParts.join('\n');
-    
+    // --- END OF QUESTION COUNT LOGIC ---
+
     const insyaInstruction = formData.mata_pelajaran.toUpperCase() === 'INSYA'
         ? `**Instruksi Khusus Mapel Insya':** Fokus soal adalah pada **penerapan** kaidah Nahwu/Sharaf (Qawaid) dalam membuat kalimat atau menjawab pertanyaan, BUKAN menguji teori. Contoh: Soal "Jim" meminta siswa menyusun kata menjadi kalimat sempurna yang menuntut penerapan i'rab, atau soal "Ba" yang jawabannya memerlukan penggunaan struktur kalimat tertentu.`
         : '';
@@ -256,6 +264,7 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         - Bahasa: ${formData.bahasa}
         
         **Struktur Soal yang Diminta:**
+        ${!showPesantrenDynamicForm(formData) ? `**PERHATIAN: Jumlah total soal yang harus dibuat adalah ${grandTotal}. Pastikan jumlah akhir sesuai.**` : ''}
         ${soalStructurePrompt}
         ${insyaInstruction}
 
@@ -270,7 +279,7 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         - Untuk SEMUA DOKUMEN LAINNYA (selain Naskah Soal), sertakan blok tanda tangan guru di akhir kontennya.
         - Gunakan tag HTML standar. Untuk soal pilihan ganda, gunakan format <ol type='A'>.
         - **PENTING: Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
-        - Untuk bahasa Arab, pastikan teks rata kanan dan arah RTL. Gunakan <div dir='rtl' style='text-align: right;'> untuk membungkus konten Arab.
+        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab (misalnya, soal, pilihan jawaban) yang harus menggunakan atribut RTL. Judul bagian (seperti "Naskah Soal"), instruksi soal dalam Bahasa Indonesia, dan bagian lain yang tidak berbahasa Arab HARUS TETAP LTR (default). Gunakan <div dir='rtl' style='text-align: right;'> untuk membungkus konten Arab.
         
         **Header Ujian (untuk Naskah Soal):**
         \`\`\`html
@@ -293,11 +302,6 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
     const jsonString = response.text.trim();
     const result = JSON.parse(jsonString);
     return result.sections;
-};
-
-const showPesantrenDynamicForm = (formData: FormData): boolean => {
-    const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase().replace(/'|\\/g, ''));
-    return formData.jenjang === 'Pesantren' && isArabicContext;
 };
 
 export const generateEcourseContent = async (formData: FormData): Promise<GeneratedSection[]> => {
@@ -370,100 +374,112 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
     return result.sections;
 };
 
-export const generateCombinedContent = async (formData: FormData, textContent: string): Promise<{ administrasi_guru: GeneratedSection[], bank_soal: GeneratedSection[] }> => {
-    const combinedSchema = {
-        type: Type.OBJECT,
-        properties: {
-            administrasi_guru: {
-                type: Type.ARRAY,
-                description: "Array of teacher administration document sections.",
-                items: {
-                    type: Type.OBJECT,
-                    properties: {
-                        id: { type: Type.STRING },
-                        title: { type: Type.STRING },
-                        content: { type: Type.STRING },
-                    },
-                    required: ['id', 'title', 'content'],
-                },
-            },
-            bank_soal: {
-                type: Type.ARRAY,
-                description: "Array of question bank document sections.",
-                items: {
-                    type: Type.OBJECT,
-                    properties: {
-                        id: { type: Type.STRING },
-                        title: { type: Type.STRING },
-                        content: { type: Type.STRING },
-                    },
-                    required: ['id', 'title', 'content'],
-                },
-            },
+// FIX: Implement and export missing functions for ImageLab and VideoLab components.
+export const generateImage = async (prompt: string): Promise<string> => {
+    // FIX: Explicitly type the 'response' to resolve the property access error on 'generatedImages'.
+    const response: GenerateImagesResponse = await withRetry(() => ai.models.generateImages({
+        model: 'imagen-4.0-generate-001',
+        prompt: prompt,
+        config: {
+            numberOfImages: 1,
+            outputMimeType: 'image/jpeg',
+            aspectRatio: '1:1',
         },
-        required: ['administrasi_guru', 'bank_soal'],
+    }));
+    const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
+    return `data:image/jpeg;base64,${base64ImageBytes}`;
+};
+
+export const editImage = async (base64ImageData: string, mimeType: string, prompt: string): Promise<string> => {
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+            parts: [
+                {
+                    inlineData: {
+                        data: base64ImageData,
+                        mimeType: mimeType,
+                    },
+                },
+                {
+                    text: prompt,
+                },
+            ],
+        },
+        config: {
+            responseModalities: [Modality.IMAGE],
+        },
+    }));
+    for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+            const base64ImageBytes: string = part.inlineData.data;
+            return `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
+        }
+    }
+    throw new Error("No image data found in response");
+};
+
+export const analyzeImage = async (base64ImageData: string, mimeType: string, prompt: string): Promise<string> => {
+    const imagePart = {
+        inlineData: {
+            mimeType: mimeType,
+            data: base64ImageData,
+        },
     };
+    const textPart = {
+        text: prompt,
+    };
+    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: { parts: [imagePart, textPart] },
+    }));
+    return response.text;
+};
+
+export const generateVideo = async (
+    prompt: string, 
+    image: { imageBytes: string; mimeType: string } | null, 
+    aspectRatio: '16:9' | '9:16'
+): Promise<any> => {
+    const payload: any = {
+        model: 'veo-3.1-fast-generate-preview',
+        prompt: prompt,
+        config: {
+            numberOfVideos: 1,
+            resolution: '720p',
+            aspectRatio: aspectRatio,
+        }
+    };
+    if (image) {
+        payload.image = image;
+    }
+    const operation = await ai.models.generateVideos(payload);
+    return operation;
+};
+
+export const checkVideoOperation = async (operation: any): Promise<any> => {
+    return await ai.operations.getVideosOperation({ operation: operation });
+};
+
+export const analyzeVideoFrames = async (frames: {data: string, mimeType: string}[], prompt: string): Promise<string> => {
+    const parts = [
+        ...frames.map(frame => ({
+            inlineData: {
+                data: frame.data,
+                mimeType: frame.mimeType,
+            }
+        })),
+        { text: prompt }
+    ];
 
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `Anda adalah AI perancang kurikulum ahli untuk sistem pendidikan Indonesia.
-        **Tugas Utama:** Berdasarkan teks buku ajar dan metadata yang diberikan, buat DUA paket dokumen lengkap secara bersamaan: (1) Paket Administrasi Guru, dan (2) Paket Bank Soal.
-
-        **Metadata:**
-        - Jenjang: ${formData.jenjang}
-        - Kelas: ${formData.kelas}
-        - Mata Pelajaran: ${formData.mata_pelajaran}
-        - Guru: ${formData.nama_guru}
-        - Sekolah: ${formData.sekolah}
-        - Tahun Ajaran: ${formData.tahun_ajaran}
-        - Semester: ${formData.semester === '1' ? 'Ganjil' : 'Genap'}
-
-        **Konten Buku Ajar (Sumber Utama):**
-        """
-        ${textContent}
-        """
-
-        **Instruksi Pembuatan:**
-        
-        **1. PAKET ADMINISTRASI GURU LENGKAP:**
-           - **Analisis CP, TP, dan ATP**: Buat tabel ATP yang runut dengan kolom-kolom berikut: 'Elemen', 'Capaian Pembelajaran', 'Tujuan Pembelajaran (TP)', 'Alur Tujuan Pembelajaran (ATP)', 'Materi Pokok', 'Alokasi Waktu', dan 'Profil Pelajar Pancasila'. Pastikan struktur tabelnya konsisten.
-           - **Program Tahunan (Prota)**: Buat tabel Prota.
-           - **Program Semester (Promes)**: Buat tabel Promes.
-           - **PENTING: Buat 5 (LIMA) buah Modul Ajar yang berbeda dan lengkap.** Setiap modul harus mencakup komponen seperti Tujuan Pembelajaran, Kegiatan Pembelajaran (Pendahuluan, Inti, Penutup), dan Asesmen. **Setiap bagian dari modul ajar harus disajikan dalam format tabel yang jelas.**
-           - **KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)**: Buat tabel KKTP.
-           - **Jurnal Harian Guru**: Buat format tabel jurnal harian yang siap diisi.
-
-        **2. PAKET BANK SOAL LENGKAP:**
-           - **Kisi-kisi Soal**: Buat tabel kisi-kisi soal yang relevan.
-           - **Naskah Soal**: Buat naskah soal yang terdiri dari 15 Pilihan Ganda dan 5 Uraian, lengkap dengan header sekolah.
-           - **Kunci Jawaban & Pembahasan**: Sediakan kunci jawaban dan pembahasan mendetail untuk setiap soal.
-           - **Analisis Soal Kualitatif**: Buat tabel analisis kualitatif.
-           - **Rubrik Penilaian**: Sediakan rubrik penilaian yang jelas untuk soal uraian.
-           - **Ringkasan Materi**: Buat ringkasan materi dari teks buku ajar yang diberikan.
-
-        **Aturan Format Output PENTING:**
-        - **Untuk "administrasi_guru", SELURUH KONTEN** untuk setiap bagian harus disajikan di dalam tag '<table>'. Gunakan struktur tabel (<table>, <thead>, <tbody>, <tr>, <th>, <td>) secara ekstensif untuk menyajikan semua informasi agar terlihat rapi dan terstruktur. Hindari penggunaan paragraf <p> atau daftar <ul>/<li> di luar tabel.
-        - Sajikan seluruh output dalam format JSON sesuai skema yang diberikan.
-        - JSON harus memiliki dua properti utama: "administrasi_guru" dan "bank_soal".
-        - Setiap properti harus berisi array dari objek-objek section.
-        - Setiap objek section harus memiliki: "id" (string unik), "title" (string), dan "content" (string dalam format HTML).
-        - **Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
-        `,
-        config: {
-            responseMimeType: 'application/json',
-            responseSchema: combinedSchema,
-            temperature: 0.6,
-            ...(formData.use_thinking_mode && { thinkingConfig: { thinkingBudget: 16384 } })
-        }
+        contents: { parts: parts },
     }));
 
-    const jsonString = response.text.trim();
-    const result = JSON.parse(jsonString);
-    return result;
+    return response.text;
 };
 
-
-// --- Missing Functions Implementation ---
 
 // Helper functions for TTS audio decoding
 function decode(base64: string) {
@@ -511,101 +527,6 @@ export const textToSpeech = async (text: string): Promise<AudioBuffer> => {
     const audioBuffer = await decodeAudioData(decodedBytes, audioContext, 24000, 1);
     audioContext.close(); // Clean up the decoding context.
     return audioBuffer;
-};
-
-export const generateImage = async (prompt: string): Promise<string> => {
-    const response: GenerateContentResponse = await withRetry(async () =>
-        ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: { parts: [{ text: prompt }] },
-            config: { responseModalities: [Modality.IMAGE] },
-        })
-    );
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-            const base64ImageBytes: string = part.inlineData.data;
-            return `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
-        }
-    }
-    throw new Error('No image generated');
-};
-
-export const editImage = async (base64ImageData: string, mimeType: string, prompt: string): Promise<string> => {
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await withRetry(() =>
-        ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: {
-                parts: [
-                    { inlineData: { data: base64ImageData, mimeType } },
-                    { text: prompt },
-                ],
-            },
-            config: { responseModalities: [Modality.IMAGE] },
-        })
-    );
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-            const base64ImageBytes: string = part.inlineData.data;
-            return `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
-        }
-    }
-    throw new Error('No image generated from edit');
-};
-
-export const analyzeImage = async (base64ImageData: string, mimeType: string, prompt: string): Promise<string> => {
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: {
-            parts: [
-                { inlineData: { data: base64ImageData, mimeType } },
-                { text: prompt },
-            ],
-        },
-    }));
-    return response.text;
-};
-
-export const generateVideo = async (prompt: string, image: { imageBytes: string, mimeType: string } | null, aspectRatio: '16:9' | '9:16'): Promise<any> => {
-    reinitializeGoogleGenAI(); // Ensure latest key is used
-    const operation = await ai.models.generateVideos({
-        model: 'veo-3.1-fast-generate-preview',
-        prompt,
-        image: image || undefined,
-        config: {
-            numberOfVideos: 1,
-            resolution: '720p',
-            aspectRatio: aspectRatio,
-        }
-    });
-    return operation;
-};
-
-export const checkVideoOperation = async (operation: any): Promise<any> => {
-    reinitializeGoogleGenAI(); // Ensure latest key is used
-    return await ai.operations.getVideosOperation({ operation });
-};
-
-export const analyzeVideoFrames = async (frames: { data: string; mimeType: string }[], prompt: string): Promise<string> => {
-    const imageParts = frames.map(frame => ({
-        inlineData: {
-            data: frame.data,
-            mimeType: frame.mimeType,
-        },
-    }));
-
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
-    const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: {
-            parts: [
-                ...imageParts,
-                { text: prompt }
-            ],
-        },
-    }));
-    return response.text;
 };
 
 export const groundedSearch = async (query: string, tool: 'web' | 'maps', location?: { latitude: number, longitude: number }): Promise<{ text: string, sources: GroundingSource[] }> => {

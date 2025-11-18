@@ -4,7 +4,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
 import GeneratorForm from './components/GeneratorForm';
-import PdfUploadForm from './components/PdfUploadForm'; // Import baru
 import ResultsDisplay from './components/ResultsDisplay';
 import HistoryList from './components/HistoryList';
 import AIAssistantModal from './components/AIAssistantModal';
@@ -12,16 +11,13 @@ import Notification from './components/Notification';
 import Chatbot from './components/Chatbot';
 import AudioLab from './components/AudioLab';
 import GroundedSearch from './components/GroundedSearch';
-import ImageLab from './components/ImageLab';
-import VideoLab from './components/VideoLab';
 import UserRegistrationModal from './components/UserRegistrationModal';
-import WelcomeScreen from './components/WelcomeScreen'; // Import baru
 import ActivityLog from './components/ActivityLog';
 import FeedbackForm from './components/FeedbackForm';
 import OnboardingTour from './components/OnboardingTour';
 import AdminPanel from './components/AdminPanel';
 import { View, Module, FormData, HistoryItem, NotificationType, GeneratedSection, ActivityLogItem, FeedbackItem, ShareableLink } from './types';
-import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections, generateEcourseContent, generateCombinedContent } from './services/geminiService';
+import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections, generateEcourseContent } from './services/geminiService';
 
 const ADMIN_USER = "Admin Guru";
 
@@ -44,7 +40,6 @@ const App: React.FC = () => {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [activityLog, setActivityLog] = useState<ActivityLogItem[]>([]);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true); // State baru
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [shareableLinks, setShareableLinks] = useState<ShareableLink[]>([]);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
@@ -57,9 +52,8 @@ const App: React.FC = () => {
       const storedUser = localStorage.getItem('currentUser');
       if (storedUser) {
         setCurrentUser(storedUser);
-        setShowWelcomeScreen(false);
       } else {
-        setShowWelcomeScreen(true);
+        setIsUserModalOpen(true);
       }
       
       // Activity Log
@@ -142,13 +136,6 @@ const App: React.FC = () => {
         console.error("Failed to save registered teachers to localStorage", error);
     }
   }, [registeredTeachers]);
-  
-  const handleStart = () => {
-    setShowWelcomeScreen(false);
-    if (!currentUser) {
-        setIsUserModalOpen(true);
-    }
-  };
 
   const showNotification = (message: string, type: NotificationType) => {
     setNotification({ message, type });
@@ -198,10 +185,6 @@ const App: React.FC = () => {
      if (module === 'admin' || module === 'soal' || module === 'ecourse') {
         setCurrentModule(module);
         setView('form');
-        setGeneratedSections([]);
-    } else if (module === 'pdf') {
-        setCurrentModule(module);
-        setView('pdfUpload');
         setGeneratedSections([]);
     } else if (module === 'adminPanel') {
         setIsAdminPanelOpen(true);
@@ -277,59 +260,6 @@ const App: React.FC = () => {
         setIsLoading(false);
       }, 500);
   }
-
-  const handlePdfSubmit = async (formData: FormData, textContent: string) => {
-      if (!currentModule) return;
-      localStorage.removeItem('savedGenerationSession');
-      setSavedSession(null);
-      startLoadingSimulation(formData);
-
-      try {
-        const { administrasi_guru, bank_soal } = await generateCombinedContent(formData, textContent);
-        
-        finishLoadingSimulation(() => {
-            const allSections = [...administrasi_guru, ...bank_soal];
-            setGeneratedSections(allSections);
-            setView('results');
-
-            // Create two history items from one generation
-            const adminHistoryItem: HistoryItem = {
-              id: `admin_${Date.now()}`,
-              ...formData,
-              module_type: 'admin',
-              generated_sections: administrasi_guru,
-              created_at: new Date().toISOString(),
-            };
-             const soalHistoryItem: HistoryItem = {
-              id: `soal_${Date.now()}`,
-              ...formData,
-              module_type: 'soal',
-              generated_sections: bank_soal,
-              created_at: new Date().toISOString(),
-            };
-
-            setHistory(prev => [soalHistoryItem, adminHistoryItem, ...prev]);
-            
-            // Add two activity logs
-            addActivityLog(formData, 'admin');
-            addActivityLog(formData, 'soal');
-            
-            showNotification('Paket Administrasi & Bank Soal berhasil digenerate!', 'success');
-        });
-
-      } catch (error) {
-        console.error("Error generating combined content:", error);
-        const errorMessage = (error as Error).toString().includes('503') || (error as Error).toString().includes('UNAVAILABLE')
-            ? 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.'
-            : 'Terjadi kesalahan saat generate. Silakan coba lagi.';
-        showNotification(errorMessage, 'error');
-        setView('pdfUpload');
-        setIsLoading(false);
-        clearProgressInterval();
-        setGenerationProgress(0);
-      }
-  };
-
 
   const handleFormSubmit = async (formData: FormData) => {
     if (!currentModule) return;
@@ -579,15 +509,6 @@ const App: React.FC = () => {
                     generationProgress={generationProgress}
                 />
             );
-        case 'pdfUpload':
-             return (
-                <PdfUploadForm
-                    onSubmit={handlePdfSubmit}
-                    onBack={handleBack}
-                    isLoading={isLoading}
-                    generationProgress={generationProgress}
-                />
-            );
         case 'results':
             return generatedSections.length > 0 && lastSubmittedFormData && (
                 <ResultsDisplay 
@@ -605,10 +526,6 @@ const App: React.FC = () => {
             return <AudioLab onBack={handleBack} />;
         case 'groundedSearch':
             return <GroundedSearch onBack={handleBack} />;
-        case 'imageLab':
-            return <ImageLab onBack={handleBack} />;
-        case 'videoLab':
-            return <VideoLab onBack={handleBack} />;
         default:
             return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} />;
     }
@@ -616,8 +533,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {showWelcomeScreen && <WelcomeScreen onStart={handleStart} />}
-      
       <Header currentUser={currentUser} />
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {view === 'dashboard' && savedSession && (

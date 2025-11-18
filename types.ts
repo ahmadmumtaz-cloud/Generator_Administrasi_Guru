@@ -1,5 +1,5 @@
-export type View = 'dashboard' | 'form' | 'results' | 'audioLab' | 'groundedSearch' | 'imageLab' | 'videoLab' | 'adminPanel' | 'ecourse' | 'pdfUpload';
-export type Module = 'admin' | 'soal' | 'ecourse' | 'pdf';
+export type View = 'dashboard' | 'form' | 'results' | 'audioLab' | 'groundedSearch' | 'adminPanel' | 'ecourse';
+export type Module = 'admin' | 'soal' | 'ecourse';
 export type NotificationType = 'success' | 'error' | 'warning';
 
 export interface GeneratedSection {
@@ -44,7 +44,6 @@ export interface FormData {
   kelompok_tka?: 'saintek' | 'soshum';
   sertakan_kisi_kisi?: boolean;
   topik_materi?: string;
-  jumlah_soal_total?: number;
   jenis_soal?: string[];
   jumlah_pg?: number;
   jumlah_uraian?: number;

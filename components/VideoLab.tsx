@@ -1,7 +1,5 @@
-
-
 import React, { useState, useEffect, useRef } from 'react';
-import { generateVideo, checkVideoOperation, analyzeVideoFrames, reinitializeGoogleGenAI } from '../services/geminiService';
+import { generateVideo, checkVideoOperation, analyzeVideoFrames } from '../services/geminiService';
 import Spinner from './Spinner';
 
 type Tab = 'generate' | 'analyze';
@@ -45,33 +43,16 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [loadingMessage, setLoadingMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
-  const [apiKeySelected, setApiKeySelected] = useState(true); // Assume true initially
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<number>();
 
   useEffect(() => {
-    const checkKey = async () => {
-        // Fix: The function call was missing a required argument.
-        // Based on the error "Expected 1 arguments, but got 0", an empty object
-        // is passed to satisfy the function signature.
-        const hasKey = await window.aistudio.hasSelectedApiKey({});
-        setApiKeySelected(hasKey);
-    };
-    checkKey();
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
   }, []);
-
-  const handleSelectKey = async () => {
-      // Fix: Corrected call to openSelectKey to align with API guidelines (0 arguments expected).
-      await window.aistudio.openSelectKey();
-      // Assume success and re-check, or just set to true to unblock UI
-      setApiKeySelected(true);
-      reinitializeGoogleGenAI();
-  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const file = e.target.files?.[0];
@@ -121,12 +102,7 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         }
     } catch (e: any) {
         console.error(e);
-        if (e.message.includes("Requested entity was not found.")) {
-            setError("Kunci API tidak valid atau tidak ditemukan. Silakan pilih kunci yang benar.");
-            setApiKeySelected(false);
-        } else {
-            setError("Gagal membuat video. Silakan coba lagi.");
-        }
+        setError("Gagal membuat video. Silakan coba lagi.");
     } finally {
         setIsLoading(false);
     }
@@ -189,17 +165,6 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         video.onerror = reject;
     });
   };
-
-  if (!apiKeySelected && activeTab === 'generate') {
-    return (
-        <div className="bg-white rounded-lg card-shadow p-6 fade-in text-center">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Diperlukan Kunci API</h3>
-            <p className="text-gray-600 mb-4">Untuk menggunakan generator video Veo, Anda harus memilih Kunci API yang valid. Pastikan proyek Anda telah mengaktifkan penagihan.</p>
-            <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline mb-6 block">Pelajari tentang penagihan</a>
-            <button onClick={handleSelectKey} className="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700">Pilih Kunci API</button>
-        </div>
-    );
-  }
 
   return (
     <div className="bg-white rounded-lg card-shadow p-6 fade-in">
