@@ -134,14 +134,17 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
 
   useEffect(() => {
     if (module === 'soal' && formData.mata_pelajaran) {
-      const isEksak = EKSAK_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase());
+      // FIX: Use a more flexible check (`.some` and `.includes`) to correctly identify variations of exact subjects 
+      // like "Matematika Peminatan" instead of relying on a strict list match.
+      const isEksak = EKSAK_SUBJECTS.some(eksakSubject => formData.mata_pelajaran.toUpperCase().includes(eksakSubject));
       const newJumlahPg = isEksak ? 25 : 30;
+      
       // Only update if the value has changed to prevent re-render loops
       if (newJumlahPg !== formData.jumlah_pg) {
         setFormData(prev => ({ ...prev, jumlah_pg: newJumlahPg }));
       }
     }
-  }, [formData.mata_pelajaran, module, formData.jumlah_pg]);
+  }, [formData.mata_pelajaran, module]);
 
 
   const [kelasOptions, setKelasOptions] = useState<string[]>([]);
