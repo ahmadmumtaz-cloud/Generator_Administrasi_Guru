@@ -16,6 +16,7 @@ import ActivityLog from './components/ActivityLog';
 import FeedbackForm from './components/FeedbackForm';
 import OnboardingTour from './components/OnboardingTour';
 import AdminPanel from './components/AdminPanel';
+import ApiKeyModal from './components/ApiKeyModal';
 import { View, Module, FormData, HistoryItem, NotificationType, GeneratedSection, ActivityLogItem, FeedbackItem, ShareableLink } from './types';
 import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections, generateEcourseContent } from './services/geminiService';
 
@@ -44,10 +45,20 @@ const App: React.FC = () => {
   const [shareableLinks, setShareableLinks] = useState<ShareableLink[]>([]);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [registeredTeachers, setRegisteredTeachers] = useState<string[]>([]);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
 
 
   useEffect(() => {
     try {
+      // API Key check
+      const storedApiKey = localStorage.getItem('userApiKey');
+      if (storedApiKey) {
+        setApiKey(storedApiKey);
+      } else {
+        setIsApiKeyModalOpen(true); // Force modal open if no key
+      }
+
       // User check
       const storedUser = localStorage.getItem('currentUser');
       if (storedUser) {
@@ -263,6 +274,12 @@ const App: React.FC = () => {
 
   const handleFormSubmit = async (formData: FormData) => {
     if (!currentModule) return;
+
+    if (!localStorage.getItem('userApiKey')) {
+        showNotification('API Key belum diatur. Mohon atur terlebih dahulu.', 'error');
+        setIsApiKeyModalOpen(true);
+        return;
+    }
     
     localStorage.removeItem('savedGenerationSession');
     setSavedSession(null);
@@ -296,9 +313,15 @@ const App: React.FC = () => {
 
     } catch (error) {
       console.error("Error generating content:", error);
-      const errorMessage = (error as Error).toString().includes('503') || (error as Error).toString().includes('UNAVAILABLE')
-          ? 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.'
-          : 'Terjadi kesalahan saat generate. Silakan coba lagi.';
+      let errorMessage = 'Terjadi kesalahan saat generate. Silakan coba lagi.';
+       if (error instanceof Error) {
+          if (error.message.includes('API Key tidak ditemukan')) {
+              errorMessage = error.message;
+              setIsApiKeyModalOpen(true);
+          } else if (error.toString().includes('503') || error.toString().includes('UNAVAILABLE')) {
+              errorMessage = 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.';
+          }
+      }
       showNotification(errorMessage, 'error');
       setView('form');
       setIsLoading(false);
@@ -493,6 +516,18 @@ const App: React.FC = () => {
       event.target.value = ''; // Reset file input
   };
 
+  const handleSaveApiKey = (key: string) => {
+    try {
+        localStorage.setItem('userApiKey', key);
+        setApiKey(key);
+        setIsApiKeyModalOpen(false);
+        showNotification('API Key berhasil disimpan!', 'success');
+    } catch (error) {
+        console.error("Failed to save API Key to localStorage", error);
+        showNotification('Gagal menyimpan API Key.', 'error');
+    }
+  };
+
 
   const renderContent = () => {
     switch(view) {
@@ -533,7 +568,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header currentUser={currentUser} />
+      <Header currentUser={currentUser} onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)} />
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {view === 'dashboard' && savedSession && (
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded-md shadow-lg" role="alert">
@@ -573,6 +608,13 @@ const App: React.FC = () => {
       </main>
       <Footer />
       
+      <ApiKeyModal
+        isOpen={isApiKeyModalOpen}
+        isDismissible={!!apiKey}
+        onSave={handleSaveApiKey}
+        onClose={() => setIsApiKeyModalOpen(false)}
+      />
+
       {isUserModalOpen && <UserRegistrationModal onSave={handleSaveUser} />}
 
       {isAdminPanelOpen && (

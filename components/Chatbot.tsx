@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Chat } from '@google/genai';
 
-// Initialize AI here or pass from props. Let's do it here for simplicity.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 interface Message {
     sender: 'user' | 'bot';
     text: string;
@@ -21,6 +18,12 @@ const Chatbot: React.FC = () => {
 
     useEffect(() => {
         if (isOpen && !chatSessionRef.current) {
+            const apiKey = localStorage.getItem('userApiKey');
+            if (!apiKey) {
+                setMessages(prev => [...prev, { sender: 'bot', text: 'API Key belum diatur. Silakan atur di Pengaturan (ikon gerigi di kanan atas).' }]);
+                return;
+            }
+            const ai = new GoogleGenAI({ apiKey });
             chatSessionRef.current = ai.chats.create({
                 model: 'gemini-2.5-flash',
                 config: {

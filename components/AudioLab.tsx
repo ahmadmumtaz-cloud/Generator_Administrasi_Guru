@@ -89,7 +89,13 @@ const AudioLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setTranscription([]);
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const apiKey = localStorage.getItem('userApiKey');
+      if (!apiKey) {
+        setTranscription(prev => [...prev, "Error: API Key tidak ditemukan. Mohon atur di Pengaturan (ikon gerigi di kanan atas)."]);
+        setConnectionState('error');
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
 
