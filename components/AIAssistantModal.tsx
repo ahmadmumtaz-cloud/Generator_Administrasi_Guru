@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { FormData } from '../types';
 import Spinner from './Spinner';
@@ -29,10 +30,12 @@ const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
+      setError(null);
       setListSuggestions([]);
       setMarkdownSuggestion('');
       setSelectedSuggestion(null);
@@ -51,6 +54,7 @@ const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         })
         .catch(err => {
             console.error("Failed to get suggestions:", err);
+            setError("Gagal mendapatkan saran dari AI. Server mungkin sedang sibuk atau terjadi kesalahan. Silakan coba lagi nanti.");
         })
         .finally(() => setIsLoading(false));
     }
@@ -127,6 +131,13 @@ const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
       />
     </div>
   );
+  
+  const renderError = () => (
+     <div className="p-3 bg-red-50 rounded-md border-l-4 border-red-400">
+        <p className="text-sm text-red-800 font-semibold">Terjadi Kesalahan</p>
+        <p className="text-sm text-red-700 mt-1">{error}</p>
+    </div>
+  );
 
   return (
     <div id="ai-modal" className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 fade-in">
@@ -144,6 +155,8 @@ const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                   <Spinner />
                   <span className="ml-2 text-gray-600">Membuat saran...</span>
               </div>
+          ) : error ? (
+            renderError()
           ) : (
             suggestionType === 'list' ? renderListContent() : renderMarkdownContent()
           )}
@@ -151,15 +164,15 @@ const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         <div className="flex justify-end space-x-2">
           {suggestionType === 'list' ? (
             <>
-              <button onClick={handleApplyListSelection} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-blue-300" disabled={!selectedSuggestion || isLoading}>Terapkan Saran</button>
+              <button onClick={handleApplyListSelection} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-blue-300" disabled={!selectedSuggestion || isLoading || !!error}>Terapkan Saran</button>
               <button onClick={onClose} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">Batal</button>
             </>
           ) : (
             <>
-              <button onClick={handleCopyMarkdown} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-green-300" disabled={!markdownSuggestion || isLoading}>
+              <button onClick={handleCopyMarkdown} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-green-300" disabled={!markdownSuggestion || isLoading || !!error}>
                 {copySuccess ? '✔️ Berhasil Disalin' : '📋 Salin Teks'}
               </button>
-              <button onClick={handleApplyMarkdown} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-blue-300" disabled={!markdownSuggestion || isLoading}>Terapkan & Tutup</button>
+              <button onClick={handleApplyMarkdown} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-blue-300" disabled={!markdownSuggestion || isLoading || !!error}>Terapkan & Tutup</button>
               <button onClick={onClose} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">Batal</button>
             </>
           )}
