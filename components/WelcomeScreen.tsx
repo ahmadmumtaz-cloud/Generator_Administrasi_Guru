@@ -1,60 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { textToSpeech } from '../services/geminiService';
+import React from 'react';
 
 interface WelcomeScreenProps {
   onStart: () => void;
 }
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
-
-  useEffect(() => {
-    let isPlaying = false;
-
-    const playWelcomeMessage = async () => {
-        if (isPlaying) return;
-        isPlaying = true;
-
-        try {
-            const welcomeText = "Selamat Datang di Platform AI Guru Inovatif. Lembaga Penjaminan Mutu Pendidikan. YPI Pondok Modern Al-Ghozali";
-            const audioBuffer = await textToSpeech(welcomeText);
-            
-            if (audioSourceRef.current) audioSourceRef.current.stop();
-            if (audioContextRef.current) audioContextRef.current.close();
-
-            const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-            const source = context.createBufferSource();
-            source.buffer = audioBuffer;
-            source.connect(context.destination);
-            source.start();
-
-            audioContextRef.current = context;
-            audioSourceRef.current = source;
-
-            source.onended = () => {
-                context.close();
-                audioContextRef.current = null;
-                audioSourceRef.current = null;
-            };
-
-        } catch (error: any) {
-            const errorMessage = error.toString();
-            if (errorMessage.includes('429') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
-                console.warn("TTS quota for welcome audio exceeded. The audio will not be played.");
-            } else {
-                console.error("Gagal memutar audio sambutan:", error);
-            }
-        }
-    };
-
-    playWelcomeMessage();
-
-    return () => {
-        if (audioSourceRef.current) audioSourceRef.current.stop();
-        if (audioContextRef.current) audioContextRef.current.close();
-    };
-  }, []);
+  // The automatic text-to-speech feature has been removed to prevent startup errors
+  // when an API key is not yet configured, which is a common scenario on platforms like Netlify.
+  // This ensures the application can load reliably and prompt for a key if necessary.
 
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex flex-col items-center justify-start p-4 py-12 text-white text-center fade-in overflow-y-auto">
