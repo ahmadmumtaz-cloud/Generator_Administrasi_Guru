@@ -89,7 +89,8 @@ const AudioLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setTranscription([]);
     
     try {
-      const apiKey = localStorage.getItem('userApiKey') || process.env.API_KEY;
+      const serverApiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+      const apiKey = localStorage.getItem('userApiKey') || serverApiKey;
       if (!apiKey) {
           throw new Error("API Key tidak dikonfigurasi. Silakan masukkan kunci Anda di pengaturan.");
       }

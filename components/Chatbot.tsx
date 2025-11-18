@@ -19,7 +19,8 @@ const Chatbot: React.FC = () => {
     useEffect(() => {
         if (isOpen && !chatSessionRef.current) {
             try {
-                const apiKey = localStorage.getItem('userApiKey') || process.env.API_KEY;
+                const serverApiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+                const apiKey = localStorage.getItem('userApiKey') || serverApiKey;
                 if (!apiKey) {
                     throw new Error("API Key tidak ditemukan. Mohon konfigurasikan di pengaturan.");
                 }

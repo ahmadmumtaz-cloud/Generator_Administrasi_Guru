@@ -53,7 +53,8 @@ const App: React.FC = () => {
   useEffect(() => {
     try {
       // API Key check - CRITICAL FOR DEPLOYMENT
-      const apiKey = localStorage.getItem('userApiKey') || process.env.API_KEY;
+      const serverApiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+      const apiKey = localStorage.getItem('userApiKey') || serverApiKey;
       if (!apiKey) {
         setIsApiKeyModalOpen(true);
         setIsApiKeyRequired(true);
