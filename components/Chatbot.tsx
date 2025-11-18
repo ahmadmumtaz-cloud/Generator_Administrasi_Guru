@@ -19,16 +19,20 @@ const Chatbot: React.FC = () => {
     useEffect(() => {
         if (isOpen && !chatSessionRef.current) {
             try {
-                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+                const apiKey = localStorage.getItem('userApiKey') || process.env.API_KEY;
+                if (!apiKey) {
+                    throw new Error("API Key tidak ditemukan. Mohon konfigurasikan di pengaturan.");
+                }
+                const ai = new GoogleGenAI({ apiKey });
                 chatSessionRef.current = ai.chats.create({
                     model: 'gemini-2.5-flash',
                     config: {
                         systemInstruction: "Anda adalah 'Asisten Cerdas', asisten AI untuk aplikasi administrasi guru. Anda didukung oleh model deep learning canggih dan memiliki akses ke materi terbaru mengenai Kurikulum Merdeka di Indonesia. Jawab pertanyaan seputar fitur aplikasi dan Kurikulum Merdeka. Jaga agar jawaban Anda ringkas, akurat, dan bermanfaat. Berkomunikasilah dalam Bahasa Indonesia.",
                     },
                 });
-            } catch(e) {
+            } catch(e: any) {
                  console.error("Chatbot initialization error:", e);
-                 setMessages(prev => [...prev, { sender: 'bot', text: 'Gagal menginisialisasi asisten. Harap hubungi administrator.' }]);
+                 setMessages(prev => [...prev, { sender: 'bot', text: `Gagal menginisialisasi asisten: ${e.message}` }]);
             }
         }
     }, [isOpen]);
@@ -117,9 +121,9 @@ const Chatbot: React.FC = () => {
                                 onKeyDown={handleKeyDown}
                                 placeholder="Ketik pertanyaan Anda..."
                                 className="flex-1 rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                                disabled={isLoading}
+                                disabled={isLoading || !chatSessionRef.current}
                             />
-                            <button onClick={handleSendMessage} disabled={isLoading} className="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 disabled:bg-indigo-400">
+                            <button onClick={handleSendMessage} disabled={isLoading || !chatSessionRef.current} className="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 disabled:bg-indigo-400">
                                 Kirim
                             </button>
                         </div>

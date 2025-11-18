@@ -82,6 +82,11 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     if (!prompt && !uploadedImage) { setError("Prompt atau gambar awal harus diisi."); return; }
     resetState("Menginisialisasi pembuatan video...");
     try {
+        const apiKey = localStorage.getItem('userApiKey') || process.env.API_KEY;
+        if (!apiKey) {
+            throw new Error("API Key tidak dikonfigurasi. Silakan masukkan kunci Anda di pengaturan.");
+        }
+        
         let operation = await generateVideo(prompt, uploadedImage ? { imageBytes: uploadedImage.base64, mimeType: uploadedImage.mimeType } : null, aspectRatio);
         
         setLoadingMessage("Video sedang diproses oleh AI. Ini mungkin memakan waktu beberapa menit. Mohon tunggu...");
@@ -93,10 +98,6 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
         if (downloadLink) {
-            const apiKey = process.env.API_KEY;
-            if (!apiKey) {
-                throw new Error("API Key tidak dikonfigurasi. Hubungi administrator.");
-            }
             const response = await fetch(`${downloadLink}&key=${apiKey}`);
             if (!response.ok) {
                 throw new Error(`Gagal mengambil video (status: ${response.status}). Periksa konfigurasi API Key.`);

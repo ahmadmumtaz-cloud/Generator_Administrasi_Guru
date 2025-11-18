@@ -89,7 +89,11 @@ const AudioLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setTranscription([]);
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+      const apiKey = localStorage.getItem('userApiKey') || process.env.API_KEY;
+      if (!apiKey) {
+          throw new Error("API Key tidak dikonfigurasi. Silakan masukkan kunci Anda di pengaturan.");
+      }
+      const ai = new GoogleGenAI({ apiKey });
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
 
@@ -174,9 +178,9 @@ const AudioLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           systemInstruction: 'Anda adalah asisten AI yang ramah dan membantu untuk aplikasi pendidikan guru. Berbicaralah dalam Bahasa Indonesia.',
         },
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setTranscription(prev => [...prev, "Error: Gagal memulai sesi. Pastikan API Key sudah benar dan coba lagi."]);
+      setTranscription(prev => [...prev, `Error: Gagal memulai sesi. ${err.message}`]);
       setConnectionState('error');
     }
   };

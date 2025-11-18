@@ -16,6 +16,7 @@ import ActivityLog from './components/ActivityLog';
 import FeedbackForm from './components/FeedbackForm';
 import OnboardingTour from './components/OnboardingTour';
 import AdminPanel from './components/AdminPanel';
+import ApiKeyModal from './components/ApiKeyModal';
 import { View, Module, FormData, HistoryItem, NotificationType, GeneratedSection, ActivityLogItem, FeedbackItem, ShareableLink } from './types';
 import { getCPSuggestions, getTopicSuggestions, generateAdminContent, generateSoalContentSections, generateEcourseContent } from './services/geminiService';
 
@@ -44,14 +45,25 @@ const App: React.FC = () => {
   const [shareableLinks, setShareableLinks] = useState<ShareableLink[]>([]);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [registeredTeachers, setRegisteredTeachers] = useState<string[]>([]);
+  
+  // FIX: State for managing API Key modal
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  const [isApiKeyRequired, setIsApiKeyRequired] = useState(false);
 
   useEffect(() => {
     try {
+      // API Key check - CRITICAL FOR DEPLOYMENT
+      const apiKey = localStorage.getItem('userApiKey') || process.env.API_KEY;
+      if (!apiKey) {
+        setIsApiKeyModalOpen(true);
+        setIsApiKeyRequired(true);
+      }
+
       // User check
       const storedUser = localStorage.getItem('currentUser');
       if (storedUser) {
         setCurrentUser(storedUser);
-      } else {
+      } else if (apiKey) { // Only prompt for user if key exists
         setIsUserModalOpen(true);
       }
       
@@ -135,6 +147,22 @@ const App: React.FC = () => {
         console.error("Failed to save registered teachers to localStorage", error);
     }
   }, [registeredTeachers]);
+  
+  const handleSaveApiKey = (key: string) => {
+    try {
+      localStorage.setItem('userApiKey', key);
+      setIsApiKeyModalOpen(false);
+      setIsApiKeyRequired(false);
+      showNotification('API Key berhasil disimpan!', 'success');
+      // After saving key, if no user, prompt for user registration
+      if (!currentUser) {
+        setIsUserModalOpen(true);
+      }
+    } catch (error) {
+      console.error("Failed to save API key", error);
+      showNotification('Gagal menyimpan API Key.', 'error');
+    }
+  };
 
   const showNotification = (message: string, type: NotificationType) => {
     setNotification({ message, type });
@@ -299,7 +327,8 @@ const App: React.FC = () => {
       if (error instanceof Error) {
         const errorString = error.toString().toLowerCase();
         if (errorString.includes('api key') || errorString.includes('permission denied')) {
-            errorMessage = 'Terjadi masalah dengan API Key. Harap hubungi administrator.';
+            errorMessage = 'API Key tidak valid atau hilang. Silakan periksa di pengaturan.';
+            setIsApiKeyModalOpen(true); // Re-prompt for API Key
         } else if (errorString.includes('503') || errorString.includes('unavailable')) {
             errorMessage = 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.';
         }
@@ -499,6 +528,11 @@ const App: React.FC = () => {
   };
 
   const renderContent = () => {
+    // Do not render main content if API key is required but not set
+    if (isApiKeyRequired) {
+      return null;
+    }
+    
     switch(view) {
         case 'dashboard':
             return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} />;
@@ -537,45 +571,57 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header currentUser={currentUser} />
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-        {view === 'dashboard' && savedSession && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded-md shadow-lg" role="alert">
-            <h3 className="font-bold">Sesi Tersimpan Ditemukan</h3>
-            <p>Anda memiliki pekerjaan yang belum selesai dari <span className="font-medium">{new Date(savedSession.created_at).toLocaleString('id-ID')}</span>. Ingin melanjutkannya?</p>
-            <div className="mt-3">
-              <button onClick={handleRestoreSession} className="bg-yellow-500 text-white font-bold py-1 px-3 rounded text-sm hover:bg-yellow-600 transition-colors">
-                Lanjutkan
-              </button>
-              <button onClick={handleDismissSavedSession} className="ml-2 border border-yellow-600 text-yellow-800 font-bold py-1 px-3 rounded text-sm hover:bg-yellow-200 transition-colors">
-                Hapus
-              </button>
+      <Header currentUser={currentUser} onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)} />
+      
+      {!isApiKeyRequired && (
+        <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+          {view === 'dashboard' && savedSession && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded-md shadow-lg" role="alert">
+              <h3 className="font-bold">Sesi Tersimpan Ditemukan</h3>
+              <p>Anda memiliki pekerjaan yang belum selesai dari <span className="font-medium">{new Date(savedSession.created_at).toLocaleString('id-ID')}</span>. Ingin melanjutkannya?</p>
+              <div className="mt-3">
+                <button onClick={handleRestoreSession} className="bg-yellow-500 text-white font-bold py-1 px-3 rounded text-sm hover:bg-yellow-600 transition-colors">
+                  Lanjutkan
+                </button>
+                <button onClick={handleDismissSavedSession} className="ml-2 border border-yellow-600 text-yellow-800 font-bold py-1 px-3 rounded text-sm hover:bg-yellow-200 transition-colors">
+                  Hapus
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {renderContent()}
-        
-        {view === 'dashboard' && (
-            <>
-                <div className="grid lg:grid-cols-2 gap-8 mt-8">
-                    <HistoryList 
-                        history={history}
-                        onView={handleViewHistory}
-                        onDelete={handleDeleteHistory}
-                    />
-                    <ActivityLog
-                        logs={activityLog}
-                    />
-                </div>
-                <div className="mt-8">
-                    <FeedbackForm onFeedbackSubmit={handleFeedbackSubmit} />
-                </div>
-            </>
-        )}
+          {renderContent()}
+          
+          {view === 'dashboard' && (
+              <>
+                  <div className="grid lg:grid-cols-2 gap-8 mt-8">
+                      <HistoryList 
+                          history={history}
+                          onView={handleViewHistory}
+                          onDelete={handleDeleteHistory}
+                      />
+                      <ActivityLog
+                          logs={activityLog}
+                      />
+                  </div>
+                  <div className="mt-8">
+                      <FeedbackForm onFeedbackSubmit={handleFeedbackSubmit} />
+                  </div>
+              </>
+          )}
 
-      </main>
+        </main>
+      )}
       <Footer />
+      
+      {isApiKeyModalOpen && (
+        <ApiKeyModal
+          isOpen={isApiKeyModalOpen}
+          onSave={handleSaveApiKey}
+          onClose={() => setIsApiKeyModalOpen(false)}
+          isDismissible={!isApiKeyRequired}
+        />
+      )}
       
       {isUserModalOpen && <UserRegistrationModal onSave={handleSaveUser} />}
 
