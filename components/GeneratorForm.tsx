@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Module, FormData, SoalPesantrenSection } from '../types';
-import { KELAS_OPTIONS, MATA_PELAJARAN_OPTIONS, ALOKASI_WAKTU_OPTIONS, PESANTREN_SOAL_LETTERS, ARABIC_SUBJECTS } from '../constants';
+import { KELAS_OPTIONS, MATA_PELAJARAN_OPTIONS, ALOKASI_WAKTU_OPTIONS, PESANTREN_SOAL_LETTERS, ARABIC_SUBJECTS, EKSAK_SUBJECTS } from '../constants';
 import Spinner from './Spinner';
 
 interface GeneratorFormProps {
@@ -33,9 +33,9 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
       tahun_ajaran: '2025-2026', nama_guru: '', fase: '',
       cp_elements: '', alokasi_waktu: '', jumlah_modul_ajar: 1,
       topik_materi: '', sertakan_kisi_kisi: true, sertakan_soal_tka: false,
-      jumlah_soal_tka: 5, sertakan_soal_tka_uraian: false, jumlah_soal_tka_uraian: 3,
+      jumlah_soal_tka: 10, sertakan_soal_tka_uraian: false, jumlah_soal_tka_uraian: 1,
       kelompok_tka: 'saintek',
-      jenis_soal: ['Pilihan Ganda', 'Uraian'], jumlah_pg: 15, jumlah_uraian: 5,
+      jenis_soal: ['Pilihan Ganda', 'Uraian'], jumlah_pg: 30, jumlah_uraian: 4,
       jumlah_isian_singkat: 0, 
       soal_pesantren_sections: [],
       tingkat_kesulitan: 'Sedang', bahasa: 'Bahasa Indonesia',
@@ -131,6 +131,18 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     
     if (newFase !== formData.fase) setFormData(prev => ({ ...prev, fase: newFase }));
   }, [formData.jenjang, formData.kelas]);
+
+  useEffect(() => {
+    if (module === 'soal' && formData.mata_pelajaran) {
+      const isEksak = EKSAK_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase());
+      const newJumlahPg = isEksak ? 25 : 30;
+      // Only update if the value has changed to prevent re-render loops
+      if (newJumlahPg !== formData.jumlah_pg) {
+        setFormData(prev => ({ ...prev, jumlah_pg: newJumlahPg }));
+      }
+    }
+  }, [formData.mata_pelajaran, module, formData.jumlah_pg]);
+
 
   const [kelasOptions, setKelasOptions] = useState<string[]>([]);
   const [mataPelajaranOptions, setMataPelajaranOptions] = useState<string[]>([]);
@@ -321,9 +333,28 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                 <button type="button" onClick={() => onShowAIAssistant(formData, 'topic')} className="text-sm text-blue-600 font-semibold hover:underline">✨ Dapatkan saran dari AI Asisten</button>
                 <div className="flex space-x-4"><label><input type="checkbox" name="Pilihan Ganda" checked={formData.jenis_soal?.includes('Pilihan Ganda')} onChange={handleCheckboxChange}/> PG</label><label><input type="checkbox" name="Uraian" checked={formData.jenis_soal?.includes('Uraian')} onChange={handleCheckboxChange}/> Uraian</label><label><input type="checkbox" name="Isian Singkat" checked={formData.jenis_soal?.includes('Isian Singkat')} onChange={handleCheckboxChange}/> Isian</label></div>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {formData.jenis_soal?.includes('Pilihan Ganda') && <input type="number" name="jumlah_pg" value={formData.jumlah_pg} onChange={handleChange} className={formElementClasses} placeholder="Jumlah PG" />}
-                    {formData.jenis_soal?.includes('Uraian') && <input type="number" name="jumlah_uraian" value={formData.jumlah_uraian} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Uraian" />}
-                    {formData.jenis_soal?.includes('Isian Singkat') && <input type="number" name="jumlah_isian_singkat" value={formData.jumlah_isian_singkat} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Isian" />}
+                    {formData.jenis_soal?.includes('Pilihan Ganda') && (
+                        <div>
+                            <label htmlFor="jumlah_pg" className="block text-sm font-medium text-gray-700 mb-1">Jumlah PG (Otomatis)</label>
+                            <div id="jumlah_pg" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700`}>
+                                {formData.jumlah_pg}
+                            </div>
+                        </div>
+                    )}
+                    {formData.jenis_soal?.includes('Uraian') && (
+                        <div>
+                            <label htmlFor="jumlah_uraian" className="block text-sm font-medium text-gray-700 mb-1">Jumlah Uraian (Tetap)</label>
+                            <div id="jumlah_uraian" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700`}>
+                                {formData.jumlah_uraian}
+                            </div>
+                        </div>
+                    )}
+                    {formData.jenis_soal?.includes('Isian Singkat') && (
+                        <div>
+                            <label htmlFor="jumlah_isian_singkat" className="block text-sm font-medium text-gray-700 mb-1">Jumlah Isian</label>
+                            <input type="number" name="jumlah_isian_singkat" id="jumlah_isian_singkat" value={formData.jumlah_isian_singkat} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Isian" />
+                        </div>
+                    )}
                 </div>
                 {['SMA', 'MA'].includes(formData.jenjang) && (
                   <div className="p-4 bg-indigo-50 border rounded-lg space-y-4">
@@ -342,14 +373,18 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
                             {formData.sertakan_soal_tka && 
                                 <div>
-                                    <label htmlFor="jumlah_soal_tka" className="text-xs font-medium text-gray-600">Jumlah TKA PG</label>
-                                    <input type="number" id="jumlah_soal_tka" name="jumlah_soal_tka" value={formData.jumlah_soal_tka} onChange={handleChange} className={formElementClasses} min="1" max="10" />
+                                    <label htmlFor="jumlah_soal_tka" className="text-xs font-medium text-gray-600">Jumlah TKA PG (Tetap)</label>
+                                    <div id="jumlah_soal_tka" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700 text-sm`}>
+                                        {formData.jumlah_soal_tka}
+                                    </div>
                                 </div>
                             }
                             {formData.sertakan_soal_tka_uraian &&
                                 <div>
-                                    <label htmlFor="jumlah_soal_tka_uraian" className="text-xs font-medium text-gray-600">Jumlah TKA Uraian</label>
-                                    <input type="number" id="jumlah_soal_tka_uraian" name="jumlah_soal_tka_uraian" value={formData.jumlah_soal_tka_uraian} onChange={handleChange} className={formElementClasses} min="1" max="5" />
+                                    <label htmlFor="jumlah_soal_tka_uraian" className="text-xs font-medium text-gray-600">Jumlah TKA Uraian (Tetap)</label>
+                                    <div id="jumlah_soal_tka_uraian" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700 text-sm`}>
+                                        {formData.jumlah_soal_tka_uraian}
+                                    </div>
                                 </div>
                             }
                             <div>
@@ -363,7 +398,9 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                     )}
                 </div>
                 )}
-                <div className="grid md:grid-cols-2 gap-6"><select name="tingkat_kesulitan" value={formData.tingkat_kesulitan} onChange={handleChange} className={formElementClasses}><option>Mudah</option><option>Sedang</option><option>Sulit (HOTS)</option></select><label><input type="checkbox" name="sertakan_kisi_kisi" checked={formData.sertakan_kisi_kisi} onChange={handleChange}/> Sertakan Kisi-kisi</label></div>
+                <div className="grid md:grid-cols-2 gap-6">
+                    <select name="tingkat_kesulitan" value={formData.tingkat_kesulitan} onChange={handleChange} className={formElementClasses}><option>Mudah</option><option>Sedang</option><option>Sulit (HOTS)</option></select>
+                </div>
            </div>
         )}
 
@@ -447,7 +484,6 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                 
                 <div className="grid md:grid-cols-2 gap-6">
                     <select name="tingkat_kesulitan" value={formData.tingkat_kesulitan} onChange={handleChange} className={formElementClasses}><option>Mudah</option><option>Sedang</option><option>Sulit (HOTS)</option></select>
-                    <label><input type="checkbox" name="sertakan_kisi_kisi" checked={formData.sertakan_kisi_kisi} onChange={handleChange}/> Sertakan Kisi-kisi</label>
                 </div>
            </div>
         )}

@@ -93,7 +93,14 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
         if (downloadLink) {
-            const response = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
+            const apiKey = localStorage.getItem('userApiKey');
+            if (!apiKey) {
+                throw new Error("API Key tidak ditemukan. Mohon atur di Pengaturan.");
+            }
+            const response = await fetch(`${downloadLink}&key=${apiKey}`);
+            if (!response.ok) {
+                throw new Error(`Gagal mengambil video (status: ${response.status}). Periksa API Key Anda.`);
+            }
             const blob = await response.blob();
             const videoUrl = URL.createObjectURL(blob);
             setGeneratedVideoUrl(videoUrl);
@@ -102,7 +109,11 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         }
     } catch (e: any) {
         console.error(e);
-        setError("Gagal membuat video. Silakan coba lagi.");
+        if (e.toString().toLowerCase().includes('api key')) {
+            setError(e.message);
+        } else {
+            setError("Gagal membuat video. Silakan coba lagi.");
+        }
     } finally {
         setIsLoading(false);
     }

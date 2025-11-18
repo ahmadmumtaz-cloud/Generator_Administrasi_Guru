@@ -314,13 +314,15 @@ const App: React.FC = () => {
     } catch (error) {
       console.error("Error generating content:", error);
       let errorMessage = 'Terjadi kesalahan saat generate. Silakan coba lagi.';
-       if (error instanceof Error) {
-          if (error.message.includes('API Key tidak ditemukan')) {
-              errorMessage = error.message;
-              setIsApiKeyModalOpen(true);
-          } else if (error.toString().includes('503') || error.toString().includes('UNAVAILABLE')) {
-              errorMessage = 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.';
-          }
+      if (error instanceof Error) {
+        const errorString = error.toString().toLowerCase();
+        // Check for both my custom error and Gemini's invalid key error
+        if (errorString.includes('api key tidak ditemukan') || errorString.includes('api key not valid')) {
+            errorMessage = 'API Key tidak valid atau tidak ditemukan. Mohon periksa dan atur di menu Pengaturan.';
+            setIsApiKeyModalOpen(true);
+        } else if (errorString.includes('503') || errorString.includes('unavailable')) {
+            errorMessage = 'Server AI sedang sibuk setelah beberapa kali percobaan otomatis. Mohon coba lagi nanti.';
+        }
       }
       showNotification(errorMessage, 'error');
       setView('form');

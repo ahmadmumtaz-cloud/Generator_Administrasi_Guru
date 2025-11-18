@@ -11,7 +11,7 @@ const getAiClient = (): GoogleGenAI => {
 };
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -170,15 +170,12 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
 
     const sectionsToGenerate = [
         { id: "naskah_soal", title: "Naskah Soal" },
+        { id: "kisi_kisi", title: "Kisi-kisi Soal" },
         { id: "kunci_jawaban", title: "Kunci Jawaban & Pembahasan" },
-        { id: "analisis_kualitatif", title: "Analisis Soal Kualitatif" },
-        { id: "rubrik_penilaian", title: "Rubrik Penilaian" },
+        { id: "analisis_kualitatif", title: "Analisis Kualitatif Soal" },
+        { id: "rubrik_penilaian", title: "Rubrik Penilaian/Penskoran" },
         { id: "ringkasan_materi", title: "Ringkasan Materi" },
     ];
-
-    if (formData.sertakan_kisi_kisi) {
-        sectionsToGenerate.splice(1, 0, { id: "kisi_kisi", title: "Kisi-kisi Soal" });
-    }
 
     const sectionPrompts = sectionsToGenerate.map((section, index) => {
         let description = '';

@@ -52,6 +52,9 @@ export const ARABIC_SUBJECTS = [
     ])
 ];
 
+// Subjects considered as exact sciences for question count logic
+export const EKSAK_SUBJECTS = ['MATEMATIKA', 'IPA', 'FISIKA', 'KIMIA', 'BIOLOGI', 'INFORMATIKA', 'KODING DAN KECERDASAN ARTIFISIAL (KKA)'];
+
 
 // Base subjects for each level
 const sdSubjects = ['Bahasa Indonesia', 'Matematika', 'IPA', 'IPS', 'PPKn', 'Bahasa Inggris', 'PJOK', 'Seni Budaya', 'Prakarya', 'PAI dan Budi Pekerti'];
