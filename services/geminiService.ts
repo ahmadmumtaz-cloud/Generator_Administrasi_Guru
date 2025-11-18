@@ -2,16 +2,11 @@ import { GoogleGenAI, Modality, Type, GenerateContentResponse, GenerateImagesRes
 import { FormData, GeneratedSection, GroundingSource } from "../types";
 import { ARABIC_SUBJECTS } from "../constants";
 
-const getAiClient = (): GoogleGenAI => {
-    const apiKey = localStorage.getItem('userApiKey');
-    if (!apiKey) {
-        throw new Error("API Key tidak ditemukan. Silakan atur API Key Anda di menu pengaturan.");
-    }
-    return new GoogleGenAI({ apiKey });
-};
+// Use a single, shared AI client instance initialized with the environment variable.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -48,7 +43,6 @@ const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delay = 2000): Pr
 };
 
 export const getCPSuggestions = async (formData: Partial<FormData>): Promise<string> => {
-    const ai = getAiClient();
     // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -58,7 +52,6 @@ export const getCPSuggestions = async (formData: Partial<FormData>): Promise<str
 };
 
 export const getTopicSuggestions = async (formData: Partial<FormData>): Promise<string> => {
-    const ai = getAiClient();
     // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -68,7 +61,6 @@ export const getTopicSuggestions = async (formData: Partial<FormData>): Promise<
 };
 
 export const generateAdminContent = async (formData: FormData): Promise<GeneratedSection[]> => {
-    const ai = getAiClient();
     // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -88,7 +80,7 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         - Bahasa: ${formData.bahasa}
         
         **Tugas:**
-        Generate TEPAT 6 dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
+        Generate dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
         1.  **Analisis CP, TP, dan ATP**: Buat tabel ATP yang runut dengan kolom-kolom berikut: 'Elemen', 'Capaian Pembelajaran', 'Tujuan Pembelajaran (TP)', 'Alur Tujuan Pembelajaran (ATP)', 'Materi Pokok', 'Alokasi Waktu', dan 'Profil Pelajar Pancasila'. Pastikan struktur tabelnya konsisten.
         2.  **Program Tahunan (Prota)**: Buat tabel Prota.
         3.  **Program Semester (Promes)**: Buat tabel Promes.
@@ -117,7 +109,6 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
 };
 
 export const generateSoalContentSections = async (formData: FormData): Promise<GeneratedSection[]> => {
-    const ai = getAiClient();
     const headerContent = formData.jenjang === 'Pesantren'
         ? `<div style='text-align: center;'><img src='${PESANTREN_HEADER_IMAGE_BASE64}' alt='Kop Surat Pesantren' style='width: 100%; max-width: 700px; margin: 0 auto;'/></div>`
         : `
@@ -233,13 +224,13 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
 
     const soalStructureParts = [];
     if (pgInstructions.length > 0) {
-        soalStructureParts.push(`- Bagian Pilihan Ganda (Total ${totalPg} soal): Buat ${pgInstructions.join(' dan ')}. Gabungkan semua soal pilihan ganda dalam satu bagian berlabel "A. Pilihan Ganda" dengan penomoran yang berurutan.`);
+        soalStructureParts.push(`- Bagian Pilihan Ganda (Total ${totalPg} soal): Buat ${pgInstructions.join(' dan ')}. Gabungkan semua soal pilihan ganda dalam satu bagian berlabel "A. Pilihan Ganda".`);
     }
     if (uraianInstructions.length > 0) {
-        soalStructureParts.push(`- Bagian Uraian (Total ${totalUraian} soal): Buat ${uraianInstructions.join(' dan ')}. Gabungkan semua soal uraian dalam satu bagian berlabel "B. Uraian" dengan penomoran yang berurutan, melanjutkan dari bagian sebelumnya.`);
+        soalStructureParts.push(`- Bagian Uraian (Total ${totalUraian} soal): Buat ${uraianInstructions.join(' dan ')}. Gabungkan semua soal uraian dalam satu bagian berlabel "B. Uraian".`);
     }
     if (isianInstructions.length > 0) {
-        soalStructureParts.push(`- Bagian Isian Singkat (Total ${totalIsian} soal): Buat ${isianInstructions.join(' dan ')}. Gabungkan dalam satu bagian berlabel "C. Isian Singkat", melanjutkan penomoran dari bagian sebelumnya.`);
+        soalStructureParts.push(`- Bagian Isian Singkat (Total ${totalIsian} soal): Buat ${isianInstructions.join(' dan ')}. Gabungkan dalam satu bagian berlabel "C. Isian Singkat".`);
     }
 
     const showPesantrenDynamicForm = (formData: FormData): boolean => {
@@ -276,15 +267,16 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         ${insyaInstruction}
 
         **Tugas:**
-        Generate TEPAT 6 dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
+        Generate dokumen-dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
         ${sectionPrompts}
 
         **Aturan Format:**
+        - **Aturan Penomoran PENTING:** Gunakan **ANGKA** (1, 2, 3, ...) untuk menomori semua soal. Jangan gunakan huruf. Penomoran harus berurutan untuk setiap jenis soal (misalnya, PG dari 1 sampai akhir, lalu Uraian mulai dari 1 lagi).
         - Root object harus memiliki properti "sections" yang berisi array.
         - Setiap objek section harus memiliki: "id" (string unik: ${sectionsToGenerate.map(s => `"${s.id}"`).join(', ')}), "title" (string), "content" (string HTML).
         - Untuk Naskah Soal, sertakan header ujian yang sudah disediakan di awal kontennya.
         - Untuk SEMUA DOKUMEN LAINNYA (selain Naskah Soal), sertakan blok tanda tangan guru di akhir kontennya.
-        - Gunakan tag HTML standar. Untuk soal pilihan ganda, gunakan format <ol type='A'>.
+        - Gunakan tag HTML standar. Untuk soal pilihan ganda, gunakan format <ol> untuk penomoran soal dan <ol type='A'> untuk opsi jawaban.
         - **PENTING: Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
         - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab (misalnya, soal, pilihan jawaban) yang harus menggunakan atribut RTL. Judul bagian (seperti "Naskah Soal"), instruksi soal dalam Bahasa Indonesia, dan bagian lain yang tidak berbahasa Arab HARUS TETAP LTR (default). Gunakan <div dir='rtl' style='text-align: right;'> untuk membungkus konten Arab.
         
@@ -312,7 +304,6 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
 };
 
 export const generateEcourseContent = async (formData: FormData): Promise<GeneratedSection[]> => {
-    const ai = getAiClient();
     // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -384,7 +375,6 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
 
 // FIX: Implement and export missing functions for ImageLab and VideoLab components.
 export const generateImage = async (prompt: string): Promise<string> => {
-    const ai = getAiClient();
     // FIX: Explicitly type the 'response' to resolve the property access error on 'generatedImages'.
     const response: GenerateImagesResponse = await withRetry(() => ai.models.generateImages({
         model: 'imagen-4.0-generate-001',
@@ -400,7 +390,6 @@ export const generateImage = async (prompt: string): Promise<string> => {
 };
 
 export const editImage = async (base64ImageData: string, mimeType: string, prompt: string): Promise<string> => {
-    const ai = getAiClient();
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
         contents: {
@@ -430,7 +419,6 @@ export const editImage = async (base64ImageData: string, mimeType: string, promp
 };
 
 export const analyzeImage = async (base64ImageData: string, mimeType: string, prompt: string): Promise<string> => {
-    const ai = getAiClient();
     const imagePart = {
         inlineData: {
             mimeType: mimeType,
@@ -452,7 +440,6 @@ export const generateVideo = async (
     image: { imageBytes: string; mimeType: string } | null, 
     aspectRatio: '16:9' | '9:16'
 ): Promise<any> => {
-    const ai = getAiClient();
     const payload: any = {
         model: 'veo-3.1-fast-generate-preview',
         prompt: prompt,
@@ -470,12 +457,10 @@ export const generateVideo = async (
 };
 
 export const checkVideoOperation = async (operation: any): Promise<any> => {
-    const ai = getAiClient();
     return await ai.operations.getVideosOperation({ operation: operation });
 };
 
 export const analyzeVideoFrames = async (frames: {data: string, mimeType: string}[], prompt: string): Promise<string> => {
-    const ai = getAiClient();
     const parts = [
         ...frames.map(frame => ({
             inlineData: {
@@ -520,7 +505,6 @@ async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: 
 }
 
 export const textToSpeech = async (text: string): Promise<AudioBuffer> => {
-    const ai = getAiClient();
     // FIX: Explicitly type the response from generateContent to resolve the type error on 'candidates'.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
@@ -545,7 +529,6 @@ export const textToSpeech = async (text: string): Promise<AudioBuffer> => {
 };
 
 export const groundedSearch = async (query: string, tool: 'web' | 'maps', location?: { latitude: number, longitude: number }): Promise<{ text: string, sources: GroundingSource[] }> => {
-    const ai = getAiClient();
     const tools: any[] = tool === 'web' ? [{ googleSearch: {} }] : [{ googleMaps: {} }];
     
     const config: any = { tools };

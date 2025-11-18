@@ -93,13 +93,13 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
         if (downloadLink) {
-            const apiKey = localStorage.getItem('userApiKey');
+            const apiKey = process.env.API_KEY;
             if (!apiKey) {
-                throw new Error("API Key tidak ditemukan. Mohon atur di Pengaturan.");
+                throw new Error("API Key tidak dikonfigurasi. Hubungi administrator.");
             }
             const response = await fetch(`${downloadLink}&key=${apiKey}`);
             if (!response.ok) {
-                throw new Error(`Gagal mengambil video (status: ${response.status}). Periksa API Key Anda.`);
+                throw new Error(`Gagal mengambil video (status: ${response.status}). Periksa konfigurasi API Key.`);
             }
             const blob = await response.blob();
             const videoUrl = URL.createObjectURL(blob);

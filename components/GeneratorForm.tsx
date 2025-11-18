@@ -132,21 +132,6 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     if (newFase !== formData.fase) setFormData(prev => ({ ...prev, fase: newFase }));
   }, [formData.jenjang, formData.kelas]);
 
-  useEffect(() => {
-    if (module === 'soal' && formData.mata_pelajaran) {
-      // FIX: Use a more flexible check (`.some` and `.includes`) to correctly identify variations of exact subjects 
-      // like "Matematika Peminatan" instead of relying on a strict list match.
-      const isEksak = EKSAK_SUBJECTS.some(eksakSubject => formData.mata_pelajaran.toUpperCase().includes(eksakSubject));
-      const newJumlahPg = isEksak ? 25 : 30;
-      
-      // Only update if the value has changed to prevent re-render loops
-      if (newJumlahPg !== formData.jumlah_pg) {
-        setFormData(prev => ({ ...prev, jumlah_pg: newJumlahPg }));
-      }
-    }
-  }, [formData.mata_pelajaran, module]);
-
-
   const [kelasOptions, setKelasOptions] = useState<string[]>([]);
   const [mataPelajaranOptions, setMataPelajaranOptions] = useState<string[]>([]);
   const [alokasiWaktuOptions, setAlokasiWaktuOptions] = useState<string[]>([]);
@@ -338,18 +323,14 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                 <div className="grid md:grid-cols-3 gap-6">
                     {formData.jenis_soal?.includes('Pilihan Ganda') && (
                         <div>
-                            <label htmlFor="jumlah_pg" className="block text-sm font-medium text-gray-700 mb-1">Jumlah PG (Otomatis)</label>
-                            <div id="jumlah_pg" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700`}>
-                                {formData.jumlah_pg}
-                            </div>
+                            <label htmlFor="jumlah_pg" className="block text-sm font-medium text-gray-700 mb-1">Jumlah PG</label>
+                            <input type="number" name="jumlah_pg" id="jumlah_pg" value={formData.jumlah_pg} onChange={handleChange} className={formElementClasses} placeholder="Jumlah PG" />
                         </div>
                     )}
                     {formData.jenis_soal?.includes('Uraian') && (
                         <div>
-                            <label htmlFor="jumlah_uraian" className="block text-sm font-medium text-gray-700 mb-1">Jumlah Uraian (Tetap)</label>
-                            <div id="jumlah_uraian" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700`}>
-                                {formData.jumlah_uraian}
-                            </div>
+                            <label htmlFor="jumlah_uraian" className="block text-sm font-medium text-gray-700 mb-1">Jumlah Uraian</label>
+                            <input type="number" name="jumlah_uraian" id="jumlah_uraian" value={formData.jumlah_uraian} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Uraian" />
                         </div>
                     )}
                     {formData.jenis_soal?.includes('Isian Singkat') && (
@@ -376,18 +357,14 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
                             {formData.sertakan_soal_tka && 
                                 <div>
-                                    <label htmlFor="jumlah_soal_tka" className="text-xs font-medium text-gray-600">Jumlah TKA PG (Tetap)</label>
-                                    <div id="jumlah_soal_tka" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700 text-sm`}>
-                                        {formData.jumlah_soal_tka}
-                                    </div>
+                                    <label htmlFor="jumlah_soal_tka" className="text-xs font-medium text-gray-600">Jumlah TKA PG</label>
+                                    <input type="number" name="jumlah_soal_tka" id="jumlah_soal_tka" value={formData.jumlah_soal_tka} onChange={handleChange} className={formElementClasses} placeholder="Jml TKA PG" />
                                 </div>
                             }
                             {formData.sertakan_soal_tka_uraian &&
                                 <div>
-                                    <label htmlFor="jumlah_soal_tka_uraian" className="text-xs font-medium text-gray-600">Jumlah TKA Uraian (Tetap)</label>
-                                    <div id="jumlah_soal_tka_uraian" className={`${formElementClasses} bg-gray-100 px-3 py-2 text-gray-700 text-sm`}>
-                                        {formData.jumlah_soal_tka_uraian}
-                                    </div>
+                                    <label htmlFor="jumlah_soal_tka_uraian" className="text-xs font-medium text-gray-600">Jumlah TKA Uraian</label>
+                                    <input type="number" name="jumlah_soal_tka_uraian" id="jumlah_soal_tka_uraian" value={formData.jumlah_soal_tka_uraian} onChange={handleChange} className={formElementClasses} placeholder="Jml TKA Uraian" />
                                 </div>
                             }
                             <div>
@@ -510,7 +487,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
             <p className="text-xs text-gray-500">Menggunakan model AI yang lebih kuat untuk hasil yang lebih komprehensif. <br/>Proses generate mungkin sedikit lebih lama.</p>
         </div>
 
-        {isLoading && <div className="my-4"><div className="flex justify-between mb-1"><span className="font-medium text-indigo-700">AI Sedang Bekerja...</span><span className="font-medium text-indigo-700">{Math.round(generationProgress)}%</span></div><div className="w-full bg-gray-200 rounded-full h-2.5"><div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${generationProgress}%` }}></div></div></div>}
+        {isLoading && <div className="my-4"><div className="flex justify-between mb-1"><span className="font-medium text-indigo-700">AI Sedang Bekerja... (Proses ini dapat memakan waktu 1-5 menit)</span><span className="font-medium text-indigo-700">{Math.round(generationProgress)}%</span></div><div className="w-full bg-gray-200 rounded-full h-2.5"><div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${generationProgress}%` }}></div></div></div>}
         <div className="flex justify-end pt-2">
             <button type="submit" disabled={isLoading} className="inline-flex items-center justify-center px-6 py-2 border rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
                 {isLoading ? <><Spinner /><span className="ml-2">Generating...</span></> : 'Generate Perangkat'}

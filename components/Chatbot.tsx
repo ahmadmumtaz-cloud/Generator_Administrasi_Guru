@@ -18,18 +18,18 @@ const Chatbot: React.FC = () => {
 
     useEffect(() => {
         if (isOpen && !chatSessionRef.current) {
-            const apiKey = localStorage.getItem('userApiKey');
-            if (!apiKey) {
-                setMessages(prev => [...prev, { sender: 'bot', text: 'API Key belum diatur. Silakan atur di Pengaturan (ikon gerigi di kanan atas).' }]);
-                return;
+            try {
+                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+                chatSessionRef.current = ai.chats.create({
+                    model: 'gemini-2.5-flash',
+                    config: {
+                        systemInstruction: "Anda adalah 'Asisten Cerdas', asisten AI untuk aplikasi administrasi guru. Anda didukung oleh model deep learning canggih dan memiliki akses ke materi terbaru mengenai Kurikulum Merdeka di Indonesia. Jawab pertanyaan seputar fitur aplikasi dan Kurikulum Merdeka. Jaga agar jawaban Anda ringkas, akurat, dan bermanfaat. Berkomunikasilah dalam Bahasa Indonesia.",
+                    },
+                });
+            } catch(e) {
+                 console.error("Chatbot initialization error:", e);
+                 setMessages(prev => [...prev, { sender: 'bot', text: 'Gagal menginisialisasi asisten. Harap hubungi administrator.' }]);
             }
-            const ai = new GoogleGenAI({ apiKey });
-            chatSessionRef.current = ai.chats.create({
-                model: 'gemini-2.5-flash',
-                config: {
-                    systemInstruction: "Anda adalah 'Asisten Cerdas', asisten AI untuk aplikasi administrasi guru. Anda didukung oleh model deep learning canggih dan memiliki akses ke materi terbaru mengenai Kurikulum Merdeka di Indonesia. Jawab pertanyaan seputar fitur aplikasi dan Kurikulum Merdeka. Jaga agar jawaban Anda ringkas, akurat, dan bermanfaat. Berkomunikasilah dalam Bahasa Indonesia.",
-                },
-            });
         }
     }, [isOpen]);
 
