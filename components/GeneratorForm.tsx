@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Module, FormData, SoalPesantrenSection } from '../types';
 import { KELAS_OPTIONS, MATA_PELAJARAN_OPTIONS, ALOKASI_WAKTU_OPTIONS, PESANTREN_SOAL_LETTERS, PESANTREN_SOAL_LETTERS_LATIN, ARABIC_SUBJECTS, EKSAK_SUBJECTS } from '../constants';
 import Spinner from './Spinner';
@@ -25,6 +25,38 @@ const PESANTREN_INSTRUCTION_OPTIONS = [
     { value: "custom", text: "Instruksi Lainnya..." },
 ];
 
+// Define log steps for each module based on progress percentage milestones
+const LOG_STEPS: Record<Module, { progress: number; message: string }[]> = {
+    admin: [
+        { progress: 5, message: "Menginisialisasi Model AI..." },
+        { progress: 15, message: "Menganalisis Capaian Pembelajaran (CP) & Fase..." },
+        { progress: 30, message: "Menyusun Alur Tujuan Pembelajaran (ATP)..." },
+        { progress: 45, message: "Meng-generate Program Tahunan (Prota) & Semester (Promes)..." },
+        { progress: 60, message: "Merancang Modul Ajar & Langkah Pembelajaran..." },
+        { progress: 75, message: "Menyusun Kriteria Ketercapaian (KKTP)..." },
+        { progress: 90, message: "Finalisasi format dokumen JSON..." },
+        { progress: 100, message: "Selesai! Memuat hasil..." }
+    ],
+    soal: [
+        { progress: 5, message: "Menginisialisasi Model AI..." },
+        { progress: 15, message: "Menganalisis Topik & Tingkat Kesulitan..." },
+        { progress: 30, message: "Menyusun Kisi-kisi Soal..." },
+        { progress: 50, message: "Meng-generate Naskah Soal..." },
+        { progress: 70, message: "Membuat Kunci Jawaban & Pembahasan..." },
+        { progress: 85, message: "Melakukan Analisis Kualitatif & Rubrik..." },
+        { progress: 95, message: "Finalisasi format dokumen..." },
+        { progress: 100, message: "Selesai! Memuat hasil..." }
+    ],
+    ecourse: [
+        { progress: 5, message: "Menginisialisasi Model AI..." },
+        { progress: 20, message: "Merancang Struktur Silabus E-Course..." },
+        { progress: 40, message: "Mengembangkan Materi per Pertemuan..." },
+        { progress: 60, message: "Membuat Latihan & Evaluasi..." },
+        { progress: 80, message: "Meng-generate Konten Slide Presentasi..." },
+        { progress: 95, message: "Finalisasi paket E-Course..." },
+        { progress: 100, message: "Selesai! Memuat hasil..." }
+    ]
+};
 
 const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack, onShowAIAssistant, isLoading, generationProgress }) => {
   const [formData, setFormData] = useState<FormData>(() => {
@@ -59,6 +91,14 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
   const [showCustomSubject, setShowCustomSubject] = useState(false);
   const [customMataPelajaran, setCustomMataPelajaran] = useState<Record<string, string[]>>({});
   const [newSubject, setNewSubject] = useState('');
+  
+  // Terminal Logs State
+  const [logs, setLogs] = useState<string[]>([]);
+  const logsEndRef = useRef<HTMLDivElement>(null);
+  const processedMilestones = useRef<Set<number>>(new Set());
+
+  // Allow dynamic Pesantren form for 'Pesantren' jenjang regardless of language
+  const showPesantrenDynamicForm = module === 'soal' && formData.jenjang === 'Pesantren';
 
   useEffect(() => {
     try {
@@ -132,6 +172,30 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     
     if (newFase !== formData.fase) setFormData(prev => ({ ...prev, fase: newFase }));
   }, [formData.jenjang, formData.kelas]);
+
+  // Terminal Log Logic
+  useEffect(() => {
+    if (!isLoading) {
+        setLogs([]);
+        processedMilestones.current.clear();
+        return;
+    }
+
+    const steps = LOG_STEPS[module] || [];
+    steps.forEach((step) => {
+        if (generationProgress >= step.progress && !processedMilestones.current.has(step.progress)) {
+            const timestamp = new Date().toLocaleTimeString('id-ID', { hour12: false });
+            setLogs(prev => [...prev, `[${timestamp}] > ${step.message}`]);
+            processedMilestones.current.add(step.progress);
+        }
+    });
+
+  }, [isLoading, generationProgress, module]);
+
+  // Auto-scroll terminal
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
 
   const [kelasOptions, setKelasOptions] = useState<string[]>([]);
   const [mataPelajaranOptions, setMataPelajaranOptions] = useState<string[]>([]);
@@ -231,6 +295,52 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // VALIDASI JUMLAH SOAL
+    if (module === 'soal' && !showPesantrenDynamicForm) {
+        const isPgSelected = formData.jenis_soal?.includes('Pilihan Ganda');
+        const isUraianSelected = formData.jenis_soal?.includes('Uraian');
+        const isIsianSelected = formData.jenis_soal?.includes('Isian Singkat');
+
+        // Validasi minimal satu jenis soal dipilih
+        if (!isPgSelected && !isUraianSelected && !isIsianSelected) {
+             alert("Mohon pilih minimal satu jenis soal (Pilihan Ganda, Uraian, atau Isian Singkat).");
+             return;
+        }
+
+        // Validasi Pilihan Ganda
+        if (isPgSelected) {
+            const pgCount = Number(formData.jumlah_pg) || 0;
+            const tkaPgCount = formData.sertakan_soal_tka ? (Number(formData.jumlah_soal_tka) || 0) : 0;
+            const totalPg = pgCount + tkaPgCount;
+            
+            if (totalPg <= 0) {
+                alert("Jumlah soal Pilihan Ganda harus lebih dari 0.");
+                return;
+            }
+        }
+
+        // Validasi Uraian
+        if (isUraianSelected) {
+            const uraianCount = Number(formData.jumlah_uraian) || 0;
+            const tkaUraianCount = formData.sertakan_soal_tka_uraian ? (Number(formData.jumlah_soal_tka_uraian) || 0) : 0;
+            const totalUraian = uraianCount + tkaUraianCount;
+
+            if (totalUraian <= 0) {
+                alert("Jumlah soal Uraian harus lebih dari 0.");
+                return;
+            }
+        }
+        
+         // Validasi Isian Singkat
+        if (isIsianSelected) {
+            if ((Number(formData.jumlah_isian_singkat) || 0) <= 0) {
+                alert("Jumlah soal Isian Singkat harus lebih dari 0.");
+                return;
+            }
+        }
+    }
+
     onSubmit(formData);
   };
 
@@ -244,8 +354,6 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
 
   // Check if we are in Arabic language context for RTL/Letter selection
   const isArabicContext = formData.bahasa === 'Bahasa Arab';
-  // Allow dynamic Pesantren form for 'Pesantren' jenjang regardless of language
-  const showPesantrenDynamicForm = module === 'soal' && formData.jenjang === 'Pesantren';
 
   return (
     <div className="bg-white rounded-lg card-shadow p-6 fade-in">
@@ -327,13 +435,19 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                 <div className="grid md:grid-cols-3 gap-6">
                     {formData.jenis_soal?.includes('Pilihan Ganda') && (
                         <div>
-                            <label htmlFor="jumlah_pg" className="block text-sm font-medium text-gray-700 mb-1">Jumlah PG</label>
+                            <label htmlFor="jumlah_pg" className="block text-sm font-medium text-gray-700 mb-1">
+                                Jumlah PG
+                                {formData.sertakan_soal_tka && <span className="text-indigo-600 font-bold ml-1">(+{formData.jumlah_soal_tka} TKA = {Number(formData.jumlah_pg || 0) + Number(formData.jumlah_soal_tka || 0)})</span>}
+                            </label>
                             <input type="number" name="jumlah_pg" id="jumlah_pg" value={formData.jumlah_pg} onChange={handleChange} className={formElementClasses} placeholder="Jumlah PG" />
                         </div>
                     )}
                     {formData.jenis_soal?.includes('Uraian') && (
                         <div>
-                            <label htmlFor="jumlah_uraian" className="block text-sm font-medium text-gray-700 mb-1">Jumlah Uraian</label>
+                            <label htmlFor="jumlah_uraian" className="block text-sm font-medium text-gray-700 mb-1">
+                                Jumlah Uraian
+                                {formData.sertakan_soal_tka_uraian && <span className="text-indigo-600 font-bold ml-1">(+{formData.jumlah_soal_tka_uraian} TKA = {Number(formData.jumlah_uraian || 0) + Number(formData.jumlah_soal_tka_uraian || 0)})</span>}
+                            </label>
                             <input type="number" name="jumlah_uraian" id="jumlah_uraian" value={formData.jumlah_uraian} onChange={handleChange} className={formElementClasses} placeholder="Jumlah Uraian" />
                         </div>
                     )}
@@ -513,7 +627,34 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
             <p className="text-xs text-gray-500">Menggunakan model AI yang lebih kuat untuk hasil yang lebih komprehensif. <br/>Proses generate mungkin sedikit lebih lama.</p>
         </div>
 
-        {isLoading && <div className="my-4"><div className="flex justify-between mb-1"><span className="font-medium text-indigo-700">AI Sedang Bekerja... (Proses ini dapat memakan waktu 1-5 menit)</span><span className="font-medium text-indigo-700">{Math.round(generationProgress)}%</span></div><div className="w-full bg-gray-200 rounded-full h-2.5"><div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${generationProgress}%` }}></div></div></div>}
+        {isLoading && (
+            <div className="my-4">
+                <div className="flex justify-between mb-1">
+                    <span className="font-medium text-indigo-700">AI Sedang Bekerja... (Estimasi: 1-5 menit)</span>
+                    <span className="font-medium text-indigo-700">{Math.round(generationProgress)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                    <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${generationProgress}%` }}></div>
+                </div>
+
+                {/* Terminal Log View */}
+                <div className="bg-gray-900 rounded-md p-4 h-48 overflow-y-auto font-mono text-sm border-l-4 border-indigo-500 shadow-inner">
+                    <div className="flex flex-col space-y-1">
+                        {logs.map((log, index) => (
+                            <p key={index} className="text-green-400">
+                                {log}
+                            </p>
+                        ))}
+                        <div ref={logsEndRef} />
+                        <div className="flex items-center text-green-400 mt-2">
+                            <span className="mr-1">{'>'}</span>
+                            <span className="w-2 h-4 bg-green-400 animate-pulse inline-block"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
         <div className="flex justify-end pt-2">
             <button type="submit" disabled={isLoading} className="inline-flex items-center justify-center px-6 py-2 border rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
                 {isLoading ? <><Spinner /><span className="ml-2">Generating...</span></> : 'Generate Perangkat'}

@@ -501,7 +501,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch(view) {
         case 'dashboard':
-            return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} />;
+            return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} onStartTour={() => setIsTourOpen(true)} />;
         case 'form':
             return currentModule && (
                 <GeneratorForm 
@@ -531,7 +531,7 @@ const App: React.FC = () => {
         case 'groundedSearch':
             return <GroundedSearch onBack={handleBack} />;
         default:
-            return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} />;
+            return <Dashboard onModuleSelect={handleModuleSelect} currentUser={currentUser} onStartTour={() => setIsTourOpen(true)} />;
     }
   }
 

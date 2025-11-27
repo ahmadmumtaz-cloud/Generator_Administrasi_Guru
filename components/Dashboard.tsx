@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Module, View } from '../types';
 
 interface DashboardProps {
   onModuleSelect: (module: Module | View) => void;
   currentUser: string | null;
+  onStartTour: () => void;
 }
 
 const modules = [
@@ -57,6 +59,13 @@ const modules = [
       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" /></svg>
     ),
     color: 'pink',
+  },
+  {
+    id: 'documentation',
+    title: 'Dokumentasi & Panduan',
+    description: 'Pelajari cara menggunakan aplikasi ini secara lengkap.',
+    color: 'purple',
+    url: '#', // Placeholder for documentation link
   },
   {
     id: 'ebook',
@@ -116,7 +125,7 @@ const ExternalLinkIcon = () => (
 );
 
 
-const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser, onStartTour }) => {
   const generatorModules = modules.filter(m => !('url' in m));
   const externalLinks = modules.filter(m => 'url' in m);
   const isAdmin = currentUser === 'Admin Guru';
@@ -130,6 +139,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser }) =>
         <p className="mt-4 text-lg text-gray-600">
           Pilih salah satu alat canggih di bawah ini untuk memulai.
         </p>
+        <div className="mt-6 flex justify-center">
+             <button onClick={onStartTour} className="flex items-center px-5 py-2 bg-indigo-100 text-indigo-700 rounded-full font-medium hover:bg-indigo-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                Lihat Panduan / Tur Aplikasi
+             </button>
+        </div>
       </div>
 
       {/* --- Main Generator Modules --- */}
@@ -190,18 +207,33 @@ const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser }) =>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-4xl mx-auto">
             {externalLinks.map(link => {
                 const colors = colorClasses[link.color as keyof typeof colorClasses];
+                // Render placeholder link or real link
                 return (
                     <a
                         href={link.url}
-                        target="_blank"
+                        target={link.url === '#' ? '_self' : '_blank'}
                         rel="noopener noreferrer"
                         id={`tour-step-${link.id}`}
                         key={link.id}
+                        onClick={(e) => {
+                            if (link.url === '#') {
+                                e.preventDefault();
+                                alert('Dokumentasi belum tersedia secara eksternal. Silakan gunakan tombol "Lihat Panduan / Tur Aplikasi" di bagian atas.');
+                            }
+                        }}
                         className={`group flex items-center p-4 border-2 rounded-lg transition-all duration-200 card-shadow ${colors.border} ${colors.hoverBorder} ${colors.hoverBg}`}
                     >
-                        <div className={`flex-shrink-0 w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center mr-4`}>
-                            <BookmarkIcon />
-                        </div>
+                        {link.id === 'documentation' ? (
+                            <div className={`flex-shrink-0 w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center mr-4`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                                </svg>
+                            </div>
+                        ) : (
+                            <div className={`flex-shrink-0 w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center mr-4`}>
+                                <BookmarkIcon />
+                            </div>
+                        )}
                         <div className="flex-grow">
                             <h4 className="font-semibold text-gray-800">{link.title}</h4>
                             <p className="text-sm text-gray-500 hidden sm:block">{link.description}</p>

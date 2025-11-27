@@ -10,7 +10,7 @@ const getAiClient = (): GoogleGenAI => {
 
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -92,18 +92,19 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         - Bahasa: ${formData.bahasa}
         
         **Tugas:**
-        Generate dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
-        1.  **Analisis CP, TP, dan ATP**: Buat tabel ATP yang runut dengan kolom-kolom berikut: 'Elemen', 'Capaian Pembelajaran', 'Tujuan Pembelajaran (TP)', 'Alur Tujuan Pembelajaran (ATP)', 'Materi Pokok', 'Alokasi Waktu', dan 'Profil Pelajar Pancasila'. Pastikan struktur tabelnya konsisten.
-        2.  **Program Tahunan (Prota)**: Buat tabel Prota.
-        3.  **Program Semester (Promes)**: Buat tabel Promes.
-        4.  **${formData.jumlah_modul_ajar} Modul Ajar**: Buat modul ajar lengkap. **Setiap bagian dari modul ajar (misalnya, Informasi Umum, Komponen Inti, Lampiran) harus disajikan dalam format tabel yang jelas dan terstruktur.**
-        5.  **KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)**: Buat tabel KKTP.
-        6.  **Jurnal Harian Guru**: Buat format tabel jurnal harian yang siap diisi.
+        Generate paket administrasi yang WAJIB terdiri dari **6 (ENAM) DOKUMEN LENGKAP** berikut dalam format JSON. Jangan melewatkan satu pun.
+        
+        1.  **Analisis CP, TP, dan ATP**: Buat tabel ATP yang runut dengan kolom-kolom: 'Elemen', 'Capaian Pembelajaran', 'Tujuan Pembelajaran (TP)', 'Alur Tujuan Pembelajaran (ATP)', 'Materi Pokok', 'Alokasi Waktu', dan 'Profil Pelajar Pancasila'.
+        2.  **Program Tahunan (Prota)**: Buat tabel Prota lengkap.
+        3.  **Program Semester (Promes)**: Buat tabel Promes lengkap untuk semester ini.
+        4.  **Modul Ajar**: Buat ${formData.jumlah_modul_ajar} Modul Ajar lengkap. Setiap bagian (Informasi Umum, Komponen Inti, Lampiran) harus dalam format tabel yang jelas.
+        5.  **KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)**: Buat tabel KKTP dengan interval nilai dan deskripsi kriteria.
+        6.  **Jurnal Harian Guru**: Buat format tabel jurnal harian yang siap diisi (Hari/Tanggal, Jam Ke, Materi, Kegiatan, Penilaian, Absensi, Catatan).
 
         **Aturan Format PENTING:**
-        - **SELURUH KONTEN** untuk setiap bagian harus disajikan di dalam tag '<table>'. Gunakan struktur tabel (<table>, <thead>, <tbody>, <tr>, <th>, <td>) secara ekstensif untuk menyajikan semua informasi agar terlihat rapi dan terstruktur. Hindari penggunaan paragraf <p> atau daftar <ul>/<li> di luar tabel.
+        - **SELURUH KONTEN** untuk setiap bagian harus disajikan di dalam tag '<table>'. Gunakan struktur tabel (<table>, <thead>, <tbody>, <tr>, <th>, <td>) secara ekstensif.
         - Root object harus memiliki properti "sections" yang berisi array.
-        - Setiap objek section harus memiliki: "id" (string unik, misal "atp"), "title" (string, misal "Analisis CP, TP, dan ATP"), "content" (string HTML).
+        - Setiap objek section harus memiliki: "id" (string unik: 'atp', 'prota', 'promes', 'modul_ajar', 'kktp', 'jurnal'), "title" (judul dokumen), "content" (string HTML).
         - **Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
         - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab yang harus menggunakan atribut RTL. Judul bagian dan konten lain yang tidak berbahasa Arab HARUS TETAP LTR. Untuk konten Arab di dalam sel tabel, gunakan <div style='text-align:right; direction:rtl;'>.
         - ${harakatInstruction}
@@ -181,39 +182,40 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         </div>
     `;
 
+    // DEFINISI 6 FILE WAJIB YANG DIMINTA
     const sectionsToGenerate = [
-        { id: "naskah_soal", title: "Naskah Soal" },
-        { id: "kisi_kisi", title: "Kisi-kisi Soal" },
-        { id: "kunci_jawaban", title: "Kunci Jawaban & Pembahasan" },
-        { id: "analisis_kualitatif", title: "Analisis Kualitatif Soal" },
-        { id: "rubrik_penilaian", title: "Rubrik Penilaian/Penskoran" },
-        { id: "ringkasan_materi", title: "Ringkasan Materi" },
+        { id: "naskah_soal", title: "1. Bank Soal (Naskah Ujian)" },
+        { id: "kunci_jawaban", title: "2. Kunci Jawaban & Pembahasan" },
+        { id: "kisi_kisi", title: "3. Kisi-kisi Soal" },
+        { id: "rubrik_penilaian", title: "4. Rubrik Penilaian/Penskoran" },
+        { id: "analisis_kualitatif", title: "5. Analisis Soal Kualitatif" },
+        { id: "ringkasan_materi", title: "6. Ringkasan Materi" },
     ];
 
     const sectionPrompts = sectionsToGenerate.map((section, index) => {
         let description = '';
         switch (section.id) {
             case 'naskah_soal':
-                description = 'Konten naskah soal lengkap sesuai struktur yang diminta.';
-                break;
-            case 'kisi_kisi':
-                description = 'Buat tabel kisi-kisi soal yang mencakup: No, Capaian Pembelajaran, Materi Pokok, Kelas/Semester, Indikator Soal, Level Kognitif (C1-C6), Bentuk Soal, dan Nomor Soal.';
+                description = 'Buat Naskah Soal lengkap sesuai struktur yang diminta (Header + Soal). Gunakan format HTML yang rapi.';
                 break;
             case 'kunci_jawaban':
-                description = 'Berikan kunci jawaban untuk PG dan Uraian. Yang terpenting, SERTAKAN PEMBAHASAN/PENJELASAN yang detail untuk SETIAP SOAL, agar siswa bisa belajar dari kesalahan.';
+                description = 'Berikan kunci jawaban untuk SEMUA soal. Yang terpenting, SERTAKAN PEMBAHASAN/PENJELASAN yang detail untuk SETIAP SOAL.';
                 break;
-            case 'analisis_kualitatif':
-                description = 'Buat analisis kualitatif dalam bentuk tabel. Kolom tabel mencakup: No. Soal, Aspek yang Dianalisis (Materi, Konstruksi, Bahasa), Keterangan (Sesuai/Tidak Sesuai), dan Catatan/Tindak Lanjut. Analisis ini untuk memastikan kualitas soal.';
+            case 'kisi_kisi':
+                description = 'Buat tabel kisi-kisi soal lengkap: No, CP, Materi, Indikator Soal, Level Kognitif (C1-C6), Bentuk Soal, No Soal.';
                 break;
             case 'rubrik_penilaian':
-                description = 'Buat rubrik penilaian yang jelas. Untuk Pilihan Ganda, berikan skor per soal (misal, skor 1 jika benar, 0 jika salah). Untuk Uraian, buat rubrik penilaian detail per soal dengan kriteria dan rentang skor (contoh: Skor 0-5 berdasarkan ketepatan konsep, kelengkapan jawaban, dan alur berpikir). Sertakan juga pedoman perhitungan nilai akhir.';
+                description = 'Buat rubrik penilaian/penskoran detail. Skor PG dan Rubrik analitik untuk Uraian.';
+                break;
+            case 'analisis_kualitatif':
+                description = 'Buat tabel analisis kualitatif: No Soal, Aspek Materi/Konstruksi/Bahasa, Keterangan Sesuai/Tidak.';
                 break;
             case 'ringkasan_materi':
-                description = 'Buat ringkasan materi yang padat dan jelas dari topik yang diujikan. Ringkasan ini harus membantu siswa mereview materi sebelum ujian.';
+                description = 'Buat ringkasan materi padat dan jelas yang mencakup semua topik yang diujikan dalam soal.';
                 break;
         }
-        return `${index + 1}. **${section.title}**: ${description}`;
-    }).join('\n');
+        return `DOKUMEN ${index + 1}: **${section.title}**\nInstruksi: ${description}`;
+    }).join('\n\n');
     
     // --- START OF QUESTION COUNT LOGIC (REVISED FOR STRICTNESS) ---
     const showPesantrenDynamicForm = (formData: FormData): boolean => {
@@ -316,19 +318,21 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         
         ${harakatInstruction}
 
-        **Tugas:**
-        Generate dokumen-dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
+        **Tugas Utama:**
+        Generate paket asesmen yang WAJIB terdiri dari **6 (ENAM) FILE/BAGIAN LENGKAP** berikut dalam format JSON. Urutan dan isi harus sesuai daftar di bawah:
+
         ${sectionPrompts}
 
         **Aturan Format:**
-        - **Aturan Penomoran PENTING:** Gunakan **ANGKA** (1, 2, 3, ...) untuk menomori semua soal. Jangan gunakan huruf. Penomoran harus berurutan untuk setiap jenis soal.
+        - **JANGAN MELEWATKAN SATU BAGIAN PUN.** Pengguna membutuhkan ke-6 file tersebut.
+        - **Aturan Penomoran PENTING:** Gunakan **ANGKA** (1, 2, 3, ...) untuk menomori semua soal. Jangan gunakan huruf. Penomoran harus berurutan.
         - Root object harus memiliki properti "sections" yang berisi array.
         - Setiap objek section harus memiliki: "id" (string unik: ${sectionsToGenerate.map(s => `"${s.id}"`).join(', ')}), "title" (string), "content" (string HTML).
         - Untuk Naskah Soal, sertakan header ujian yang sudah disediakan di awal kontennya.
         - Untuk SEMUA DOKUMEN LAINNYA (selain Naskah Soal), sertakan blok tanda tangan guru di akhir kontennya.
         - Gunakan tag HTML standar. Untuk soal pilihan ganda, gunakan format <ol> untuk penomoran soal dan <ol type='A'> untuk opsi jawaban.
         - **PENTING: Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
-        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab (misalnya, soal, pilihan jawaban) yang harus menggunakan atribut RTL. Judul bagian (seperti "Naskah Soal"), instruksi soal dalam Bahasa Indonesia, dan bagian lain yang tidak berbahasa Arab HARUS TETAP LTR (default). Gunakan <div dir='rtl' style='text-align: right;'> untuk membungkus konten Arab.
+        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab yang harus menggunakan atribut RTL. Judul bagian dan instruksi Bahasa Indonesia HARUS TETAP LTR.
         
         **Header Ujian (untuk Naskah Soal):**
         \`\`\`html
