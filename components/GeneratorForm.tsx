@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Module, FormData, SoalPesantrenSection } from '../types';
-import { KELAS_OPTIONS, MATA_PELAJARAN_OPTIONS, ALOKASI_WAKTU_OPTIONS, PESANTREN_SOAL_LETTERS, ARABIC_SUBJECTS, EKSAK_SUBJECTS } from '../constants';
+import { KELAS_OPTIONS, MATA_PELAJARAN_OPTIONS, ALOKASI_WAKTU_OPTIONS, PESANTREN_SOAL_LETTERS, PESANTREN_SOAL_LETTERS_LATIN, ARABIC_SUBJECTS, EKSAK_SUBJECTS } from '../constants';
 import Spinner from './Spinner';
 
 interface GeneratorFormProps {
@@ -166,10 +167,11 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
 
   // --- NEW DYNAMIC PESANTREN SECTION HANDLERS ---
   const addPesantrenSection = () => {
+    const isArabic = formData.bahasa === 'Bahasa Arab';
     const newSection: SoalPesantrenSection = {
         id: `section_${Date.now()}`,
-        letter: 'Alif',
-        instruction: PESANTREN_INSTRUCTION_OPTIONS[0].value,
+        letter: isArabic ? 'Alif' : 'Bagian A',
+        instruction: isArabic ? PESANTREN_INSTRUCTION_OPTIONS[0].value : 'Jawablah pertanyaan berikut!',
         count: 5,
     };
     setFormData(prev => ({
@@ -240,8 +242,10 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
     : 'Lengkapi form untuk menghasilkan silabus, materi, latihan, dan slide presentasi untuk e-course Anda.';
   const formElementClasses = "w-full rounded-md border-2 border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 ease-in-out";
 
-  const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase().replace(/'|\\/g, ''));
-  const showPesantrenDynamicForm = module === 'soal' && formData.jenjang === 'Pesantren' && isArabicContext;
+  // Check if we are in Arabic language context for RTL/Letter selection
+  const isArabicContext = formData.bahasa === 'Bahasa Arab';
+  // Allow dynamic Pesantren form for 'Pesantren' jenjang regardless of language
+  const showPesantrenDynamicForm = module === 'soal' && formData.jenjang === 'Pesantren';
 
   return (
     <div className="bg-white rounded-lg card-shadow p-6 fade-in">
@@ -390,9 +394,15 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                 <button type="button" onClick={() => onShowAIAssistant(formData, 'topic')} className="text-sm text-blue-600 font-semibold hover:underline">✨ Dapatkan saran dari AI Asisten</button>
                 
                 <div className="p-4 bg-gray-50 border rounded-lg space-y-3">
-                    <h3 className="font-semibold text-gray-800">Pembangun Bagian Soal (Berbahasa Arab)</h3>
+                    <h3 className="font-semibold text-gray-800">
+                        {isArabicContext ? 'Pembangun Bagian Soal (Berbahasa Arab)' : 'Pembangun Bagian Soal (Format Pesantren)'}
+                    </h3>
                     {(formData.soal_pesantren_sections || []).map((section) => {
-                        const isCustomInstruction = !PESANTREN_INSTRUCTION_OPTIONS.some(opt => opt.value === section.instruction);
+                        // Check if current instruction is in the presets
+                        const isCustomInstruction = isArabicContext 
+                            ? !PESANTREN_INSTRUCTION_OPTIONS.some(opt => opt.value === section.instruction)
+                            : true; // Always custom input for non-Arabic, unless we map presets
+
                         return (
                             <div key={section.id} className="flex flex-col md:flex-row items-center gap-3 p-3 bg-white rounded-lg border shadow-sm">
                                 <select
@@ -400,33 +410,49 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ module, onSubmit, onBack,
                                     onChange={(e) => handlePesantrenSectionChange(section.id, 'letter', e.target.value)}
                                     className={`${formElementClasses} w-full md:w-auto font-mono`}
                                 >
-                                    {PESANTREN_SOAL_LETTERS.map(l => <option key={l} value={l}>{l}</option>)}
+                                    {isArabicContext 
+                                        ? PESANTREN_SOAL_LETTERS.map(l => <option key={l} value={l}>{l}</option>)
+                                        : PESANTREN_SOAL_LETTERS_LATIN.map(l => <option key={l} value={`Bagian ${l}`}>{l}</option>)
+                                    }
                                 </select>
 
                                 <div className="flex-grow w-full">
-                                    <select
-                                        value={isCustomInstruction ? 'custom' : section.instruction}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            handlePesantrenSectionChange(section.id, 'instruction', value === 'custom' ? '' : value);
-                                        }}
-                                        className={`${formElementClasses} w-full`}
-                                    >
-                                        {PESANTREN_INSTRUCTION_OPTIONS.map(opt => (
-                                            <option key={opt.value} value={opt.value}>
-                                                {opt.text} {opt.value !== 'custom' && `— ${opt.value}`}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    {isArabicContext ? (
+                                        <>
+                                            <select
+                                                value={isCustomInstruction ? 'custom' : section.instruction}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    handlePesantrenSectionChange(section.id, 'instruction', value === 'custom' ? '' : value);
+                                                }}
+                                                className={`${formElementClasses} w-full`}
+                                            >
+                                                {PESANTREN_INSTRUCTION_OPTIONS.map(opt => (
+                                                    <option key={opt.value} value={opt.value}>
+                                                        {opt.text} {opt.value !== 'custom' && `— ${opt.value}`}
+                                                    </option>
+                                                ))}
+                                            </select>
 
-                                    {isCustomInstruction && (
+                                            {isCustomInstruction && (
+                                                <input
+                                                    type="text"
+                                                    value={section.instruction}
+                                                    placeholder="اكتب الأمر هنا..."
+                                                    onChange={(e) => handlePesantrenSectionChange(section.id, 'instruction', e.target.value)}
+                                                    className={`mt-2 ${formElementClasses} arabic-font-preview w-full`}
+                                                    style={{ textAlign: 'right' }}
+                                                    required
+                                                />
+                                            )}
+                                        </>
+                                    ) : (
                                         <input
                                             type="text"
                                             value={section.instruction}
-                                            placeholder="اكتب الأمر هنا..."
+                                            placeholder="Tulis instruksi soal di sini..."
                                             onChange={(e) => handlePesantrenSectionChange(section.id, 'instruction', e.target.value)}
-                                            className={`mt-2 ${formElementClasses} arabic-font-preview w-full`}
-                                            style={{ textAlign: 'right' }}
+                                            className={`${formElementClasses} w-full`}
                                             required
                                         />
                                     )}

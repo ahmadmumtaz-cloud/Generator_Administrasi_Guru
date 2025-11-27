@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { generateVideo, checkVideoOperation, analyzeVideoFrames } from '../services/geminiService';
 import Spinner from './Spinner';
@@ -82,10 +83,9 @@ const VideoLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     if (!prompt && !uploadedImage) { setError("Prompt atau gambar awal harus diisi."); return; }
     resetState("Menginisialisasi pembuatan video...");
     try {
-        const serverApiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
-        const apiKey = localStorage.getItem('userApiKey') || serverApiKey;
+        const apiKey = process.env.API_KEY;
         if (!apiKey) {
-            throw new Error("API Key tidak dikonfigurasi. Silakan masukkan kunci Anda di pengaturan.");
+            throw new Error("API Key tidak dikonfigurasi.");
         }
         
         let operation = await generateVideo(prompt, uploadedImage ? { imageBytes: uploadedImage.base64, mimeType: uploadedImage.mimeType } : null, aspectRatio);

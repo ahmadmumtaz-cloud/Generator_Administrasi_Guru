@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 // Fix: Removed 'LiveSession' as it is not an exported member of the module.
 import { GoogleGenAI, LiveServerMessage, Modality, Blob } from '@google/genai';
@@ -89,12 +88,7 @@ const AudioLab: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setTranscription([]);
     
     try {
-      const serverApiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
-      const apiKey = localStorage.getItem('userApiKey') || serverApiKey;
-      if (!apiKey) {
-          throw new Error("API Key tidak dikonfigurasi. Silakan masukkan kunci Anda di pengaturan.");
-      }
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
 

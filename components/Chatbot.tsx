@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Chat } from '@google/genai';
 
@@ -19,12 +20,7 @@ const Chatbot: React.FC = () => {
     useEffect(() => {
         if (isOpen && !chatSessionRef.current) {
             try {
-                const serverApiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
-                const apiKey = localStorage.getItem('userApiKey') || serverApiKey;
-                if (!apiKey) {
-                    throw new Error("API Key tidak ditemukan. Mohon konfigurasikan di pengaturan.");
-                }
-                const ai = new GoogleGenAI({ apiKey });
+                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
                 chatSessionRef.current = ai.chats.create({
                     model: 'gemini-2.5-flash',
                     config: {

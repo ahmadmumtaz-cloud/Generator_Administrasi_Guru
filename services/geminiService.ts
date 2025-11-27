@@ -1,20 +1,16 @@
+
 import { GoogleGenAI, Modality, Type, GenerateContentResponse, GenerateImagesResponse } from "@google/genai";
 import { FormData, GeneratedSection, GroundingSource } from "../types";
 import { ARABIC_SUBJECTS } from "../constants";
 
-// FIX: A lazy-loaded client getter to prevent app crash on load if API key is missing.
+// FIX: A lazy-loaded client getter using process.env.API_KEY
 const getAiClient = (): GoogleGenAI => {
-    const serverApiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
-    const apiKey = localStorage.getItem('userApiKey') || serverApiKey;
-    if (!apiKey) {
-        throw new Error("API Key tidak dikonfigurasi. Silakan masukkan kunci Anda di pengaturan.");
-    }
-    return new GoogleGenAI({ apiKey });
+    return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -215,8 +211,9 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
     
     // --- START OF QUESTION COUNT LOGIC (REVISED FOR STRICTNESS) ---
     const showPesantrenDynamicForm = (formData: FormData): boolean => {
-        const isArabicContext = formData.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData.mata_pelajaran.toUpperCase().replace(/'|\\/g, ''));
-        return formData.jenjang === 'Pesantren' && isArabicContext;
+        // Now returns true for Pesantren regardless of language, supporting both
+        // Arabic (Alif/Ba/Jim) and Indonesian (A/B/C) structures.
+        return formData.jenjang === 'Pesantren';
     };
 
     let soalStructurePrompt = "";

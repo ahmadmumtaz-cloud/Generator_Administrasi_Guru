@@ -4,7 +4,9 @@ import { ARABIC_SUBJECTS } from '../constants';
 import { textToSpeech } from '../services/geminiService';
 
 const downloadDoc = (fileName: string, content: string, formData: FormData | null) => {
-    const isArabicContext = formData?.bahasa === 'Bahasa Arab' || ARABIC_SUBJECTS.includes(formData?.mata_pelajaran.toUpperCase().replace(/'|\\/g, '') || '');
+    // Strict check: RTL is applied only if the chosen language is 'Bahasa Arab'.
+    // This allows Indonesian language exams for Islamic subjects to remain LTR.
+    const isArabicContext = formData?.bahasa === 'Bahasa Arab';
 
     // Set a smaller font size to ensure content fits portrait legal paper
     const fontAndDirectionStyles = isArabicContext 

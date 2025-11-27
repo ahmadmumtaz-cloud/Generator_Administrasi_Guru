@@ -83,3 +83,4 @@ export const ALOKASI_WAKTU_OPTIONS: Record<string, string[]> = {
 };
 
 export const PESANTREN_SOAL_LETTERS = ['Alif', 'Ba', 'Jim', 'Dal', 'Ha', 'Waw', 'Zay'];
+export const PESANTREN_SOAL_LETTERS_LATIN = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
