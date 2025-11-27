@@ -3,14 +3,46 @@ import { GoogleGenAI, Modality, Type, GenerateContentResponse, GenerateImagesRes
 import { FormData, GeneratedSection, GroundingSource } from "../types";
 import { ARABIC_SUBJECTS } from "../constants";
 
-// FIX: A lazy-loaded client getter using process.env.API_KEY
+// Helper function to safely get the API Key in various environments
+const getApiKey = (): string => {
+    // 1. Try standard process.env (Node/Webpack)
+    try {
+        if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+            return process.env.API_KEY;
+        }
+    } catch (e) {}
+
+    // 2. Try Vite-style import.meta.env
+    try {
+        // @ts-ignore
+        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+            // @ts-ignore
+            return import.meta.env.VITE_API_KEY;
+        }
+    } catch (e) {}
+    
+    // 3. Try React App style
+    try {
+        if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) {
+            return process.env.REACT_APP_API_KEY;
+        }
+    } catch (e) {}
+
+    // Return empty string if not found, let getAiClient handle the error
+    return "";
+};
+
 const getAiClient = (): GoogleGenAI => {
-    return new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = getApiKey();
+    if (!apiKey) {
+        throw new Error("API Key tidak ditemukan. Pastikan Environment Variable 'API_KEY' sudah diatur di Netlify (Site Settings > Environment variables).");
+    }
+    return new GoogleGenAI({ apiKey });
 };
 
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -33,6 +65,40 @@ const sectionsSchema = {
     required: ['sections'],
 };
 
+// ROBUST JSON PARSER HELPER
+const cleanAndParseJson = (text: string): any => {
+    if (!text) throw new Error("Respon AI kosong.");
+
+    let cleanText = text.trim();
+    
+    // 1. Remove Markdown code blocks if present
+    cleanText = cleanText.replace(/```json|```/g, '');
+    
+    // 2. Aggressively find the JSON object/array start and end
+    // This ignores any conversational filler text before or after the JSON
+    const firstBrace = cleanText.indexOf('{');
+    const lastBrace = cleanText.lastIndexOf('}');
+    
+    if (firstBrace !== -1 && lastBrace !== -1) {
+        cleanText = cleanText.substring(firstBrace, lastBrace + 1);
+    } else {
+        // Fallback: Try array format if object format fails
+        const firstBracket = cleanText.indexOf('[');
+        const lastBracket = cleanText.lastIndexOf(']');
+        if (firstBracket !== -1 && lastBracket !== -1) {
+            cleanText = cleanText.substring(firstBracket, lastBracket + 1);
+        }
+    }
+
+    try {
+        return JSON.parse(cleanText);
+    } catch (e) {
+        console.error("JSON Parse Error. Raw text:", text);
+        console.error("Attempted to parse:", cleanText);
+        throw new Error("Gagal memproses format data dari AI. Silakan coba generate ulang.");
+    }
+};
+
 const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delay = 2000): Promise<T> => {
     try {
         return await fn();
@@ -48,7 +114,6 @@ const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delay = 2000): Pr
 
 export const getCPSuggestions = async (formData: Partial<FormData>): Promise<string> => {
     const ai = getAiClient();
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Buat daftar Elemen Capaian Pembelajaran (CP) untuk mata pelajaran ${formData.mata_pelajaran}, jenjang ${formData.jenjang}, kelas ${formData.kelas}, fase ${formData.fase}. Sajikan dalam format Markdown dengan poin-poin.`,
@@ -58,7 +123,6 @@ export const getCPSuggestions = async (formData: Partial<FormData>): Promise<str
 
 export const getTopicSuggestions = async (formData: Partial<FormData>): Promise<string> => {
     const ai = getAiClient();
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Berikan daftar ide Topik/Materi Pembelajaran yang relevan untuk mata pelajaran ${formData.mata_pelajaran}, jenjang ${formData.jenjang}, kelas ${formData.kelas}, fase ${formData.fase} untuk semester ${formData.semester}. Sajikan dalam format Markdown dengan poin-poin.`,
@@ -73,7 +137,6 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         ? "**INSTRUKSI KHUSUS BAHASA ARAB: Seluruh teks Arab (Ayat Al-Qur'an, Hadits, atau teks materi) WAJIB MENGGUNAKAN HARAKAT LENGKAP (FULL TASHKEEL).**"
         : "";
 
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Anda adalah asisten ahli untuk guru di Indonesia. Buatkan dokumen administrasi guru lengkap sesuai Kurikulum Merdeka.
@@ -117,16 +180,8 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         }
     }));
 
-    // FIX: Implement robust JSON parsing to handle optional markdown code fences from the model.
-    let jsonString = response.text.trim();
-    if (jsonString.startsWith('```json')) {
-        jsonString = jsonString.substring(7).trim();
-    }
-    if (jsonString.endsWith('```')) {
-        jsonString = jsonString.slice(0, -3).trim();
-    }
-    
-    const result = JSON.parse(jsonString);
+    // Use robust cleaner
+    const result = cleanAndParseJson(response.text);
     return result.sections;
 };
 
@@ -219,8 +274,6 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
     
     // --- START OF QUESTION COUNT LOGIC (REVISED FOR STRICTNESS) ---
     const showPesantrenDynamicForm = (formData: FormData): boolean => {
-        // Now returns true for Pesantren regardless of language, supporting both
-        // Arabic (Alif/Ba/Jim) and Indonesian (A/B/C) structures.
         return formData.jenjang === 'Pesantren';
     };
 
@@ -232,7 +285,6 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
             `- Bagian ${section.letter}: Buat ${section.count} soal sesuai perintah: "${section.instruction}"`
         ).join('\n');
     } else {
-        // Strict counting logic for Standard + TKA
         const isPgSelected = formData.jenis_soal?.includes('Pilihan Ganda');
         const isUraianSelected = formData.jenis_soal?.includes('Uraian');
         const isIsianSelected = formData.jenis_soal?.includes('Isian Singkat');
@@ -260,8 +312,6 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
             if (subDetail.length > 0) {
                 detail += ` (Terdiri dari: ${subDetail.join(' + ')}).`;
             }
-            
-            // Critical instruction for numbering continuity
             detail += ` **PENTING: Gabungkan semuanya dalam SATU BAGIAN "A. Pilihan Ganda". Penomoran soal harus berurutan dari 1 sampai ${totalPg}. Jangan mulai dari 1 lagi untuk soal TKA.**`;
             instructions.push(detail);
         }
@@ -275,7 +325,6 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
             if (subDetail.length > 0) {
                 detail += ` (Terdiri dari: ${subDetail.join(' + ')}).`;
             }
-            
             detail += ` **PENTING: Gabungkan semuanya dalam SATU BAGIAN "B. Uraian". Penomoran soal harus berurutan dari 1 sampai ${totalUraian}.**`;
             instructions.push(detail);
         }
@@ -297,7 +346,6 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         ? "**PENTING: SELURUH TEKS DALAM BAHASA ARAB (TERMASUK SOAL, PILIHAN JAWABAN, DAN KUTIPAN) WAJIB DIBERI HARAKAT LENGKAP (FULL TASHKEEL) AGAR TIDAK SALAH BACA.**"
         : "";
 
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Anda adalah AI pembuat soal ujian ahli. Buatkan paket asesmen lengkap berdasarkan data berikut.
@@ -352,16 +400,8 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         }
     }));
 
-    // FIX: Implement robust JSON parsing to handle optional markdown code fences from the model.
-    let jsonString = response.text.trim();
-    if (jsonString.startsWith('```json')) {
-        jsonString = jsonString.substring(7).trim();
-    }
-    if (jsonString.endsWith('```')) {
-        jsonString = jsonString.slice(0, -3).trim();
-    }
-    
-    const result = JSON.parse(jsonString);
+    // Use robust cleaner
+    const result = cleanAndParseJson(response.text);
     return result.sections;
 };
 
@@ -372,7 +412,6 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
         ? "**INSTRUKSI KHUSUS BAHASA ARAB: Seluruh materi dan teks Arab WAJIB MENGGUNAKAN HARAKAT LENGKAP (FULL TASHKEEL).**"
         : "";
 
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Anda adalah seorang *Instructional Designer* ahli. Tugas Anda adalah merancang dan membuat E-Course lengkap berdasarkan data berikut.
@@ -420,16 +459,8 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
         }
     }));
 
-    // FIX: Implement robust JSON parsing to handle optional markdown code fences from the model.
-    let jsonString = response.text.trim();
-    if (jsonString.startsWith('```json')) {
-        jsonString = jsonString.substring(7).trim();
-    }
-    if (jsonString.endsWith('```')) {
-        jsonString = jsonString.slice(0, -3).trim();
-    }
-    
-    const result = JSON.parse(jsonString);
+    // Use robust cleaner
+    const result = cleanAndParseJson(response.text);
     
     // Process the HTML content to wrap slide content
     if (result.sections && result.sections[0] && result.sections[0].content) {
@@ -450,10 +481,8 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
     return result.sections;
 };
 
-// FIX: Implement and export missing functions for ImageLab and VideoLab components.
 export const generateImage = async (prompt: string): Promise<string> => {
     const ai = getAiClient();
-    // FIX: Explicitly type the 'response' to resolve the property access error on 'generatedImages'.
     const response: GenerateImagesResponse = await withRetry(() => ai.models.generateImages({
         model: 'imagen-4.0-generate-001',
         prompt: prompt,
@@ -488,7 +517,6 @@ export const editImage = async (base64ImageData: string, mimeType: string, promp
             responseModalities: [Modality.IMAGE],
         },
     }));
-    // FIX: Safely access response parts using optional chaining to prevent runtime errors.
     for (const part of response.candidates?.[0]?.content?.parts || []) {
         if (part.inlineData) {
             const base64ImageBytes: string = part.inlineData.data;
@@ -590,7 +618,6 @@ async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: 
 
 export const textToSpeech = async (text: string): Promise<AudioBuffer> => {
     const ai = getAiClient();
-    // FIX: Explicitly type the response from generateContent to resolve the type error on 'candidates'.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: `Say with a friendly and clear female Indonesian voice: ${text}` }] }],
@@ -605,11 +632,10 @@ export const textToSpeech = async (text: string): Promise<AudioBuffer> => {
     if (!base64Audio) {
         throw new Error("No audio data returned from TTS API.");
     }
-    // A new context is created here just for decoding. The component will use its own context for playback.
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
     const decodedBytes = decode(base64Audio);
     const audioBuffer = await decodeAudioData(decodedBytes, audioContext, 24000, 1);
-    audioContext.close(); // Clean up the decoding context.
+    audioContext.close();
     return audioBuffer;
 };
 
@@ -622,7 +648,6 @@ export const groundedSearch = async (query: string, tool: 'web' | 'maps', locati
         config.toolConfig = { retrievalConfig: { latLng: location } };
     }
     
-    // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: query,
