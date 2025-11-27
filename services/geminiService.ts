@@ -68,6 +68,11 @@ export const getTopicSuggestions = async (formData: Partial<FormData>): Promise<
 
 export const generateAdminContent = async (formData: FormData): Promise<GeneratedSection[]> => {
     const ai = getAiClient();
+    
+    const harakatInstruction = formData.bahasa === 'Bahasa Arab' 
+        ? "**INSTRUKSI KHUSUS BAHASA ARAB: Seluruh teks Arab (Ayat Al-Qur'an, Hadits, atau teks materi) WAJIB MENGGUNAKAN HARAKAT LENGKAP (FULL TASHKEEL).**"
+        : "";
+
     // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -100,7 +105,8 @@ export const generateAdminContent = async (formData: FormData): Promise<Generate
         - Root object harus memiliki properti "sections" yang berisi array.
         - Setiap objek section harus memiliki: "id" (string unik, misal "atp"), "title" (string, misal "Analisis CP, TP, dan ATP"), "content" (string HTML).
         - **Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
-        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab yang harus menggunakan atribut RTL. Judul bagian dan konten lain yang tidak berbahasa Arab HARUS TETAP LTR. Untuk konten Arab di dalam sel tabel, gunakan <p style='text-align:right; direction:rtl;'>.
+        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab yang harus menggunakan atribut RTL. Judul bagian dan konten lain yang tidak berbahasa Arab HARUS TETAP LTR. Untuk konten Arab di dalam sel tabel, gunakan <div style='text-align:right; direction:rtl;'>.
+        - ${harakatInstruction}
         `,
         config: {
             responseMimeType: 'application/json',
@@ -284,6 +290,10 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
     const insyaInstruction = formData.mata_pelajaran.toUpperCase() === 'INSYA'
         ? `**Instruksi Khusus Mapel Insya':** Fokus soal adalah pada **penerapan** kaidah Nahwu/Sharaf (Qawaid) dalam membuat kalimat atau menjawab pertanyaan, BUKAN menguji teori. Contoh: Soal "Jim" meminta siswa menyusun kata menjadi kalimat sempurna yang menuntut penerapan i'rab, atau soal "Ba" yang jawabannya memerlukan penggunaan struktur kalimat tertentu.`
         : '';
+    
+    const harakatInstruction = formData.bahasa === 'Bahasa Arab' 
+        ? "**PENTING: SELURUH TEKS DALAM BAHASA ARAB (TERMASUK SOAL, PILIHAN JAWABAN, DAN KUTIPAN) WAJIB DIBERI HARAKAT LENGKAP (FULL TASHKEEL) AGAR TIDAK SALAH BACA.**"
+        : "";
 
     // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
@@ -303,6 +313,8 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         ${soalStructurePrompt}
         
         ${insyaInstruction}
+        
+        ${harakatInstruction}
 
         **Tugas:**
         Generate dokumen-dokumen berikut dalam format JSON. Setiap dokumen harus menjadi objek dalam array 'sections', dengan 'id', 'title', dan 'content' (dalam format HTML).
@@ -351,6 +363,11 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
 
 export const generateEcourseContent = async (formData: FormData): Promise<GeneratedSection[]> => {
     const ai = getAiClient();
+    
+    const harakatInstruction = formData.bahasa === 'Bahasa Arab' 
+        ? "**INSTRUKSI KHUSUS BAHASA ARAB: Seluruh materi dan teks Arab WAJIB MENGGUNAKAN HARAKAT LENGKAP (FULL TASHKEEL).**"
+        : "";
+
     // FIX: Explicitly type the response from generateContent to ensure type safety.
     const response: GenerateContentResponse = await withRetry(() => ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -389,6 +406,7 @@ export const generateEcourseContent = async (formData: FormData): Promise<Genera
         - Gunakan tag HTML standar (<h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <strong>).
         - **PENTING: Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
         - Pastikan seluruh output adalah satu string HTML yang valid di dalam properti "content".
+        - ${harakatInstruction}
         `,
         config: {
             responseMimeType: "application/json",
