@@ -42,7 +42,7 @@ const getAiClient = (): GoogleGenAI => {
 
 
 // NEW: Base64 encoded image for the Pesantren exam header
-const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
+const PESANTREN_HEADER_IMAGE_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAADIBAMAAABN/C3bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAABRFFBRAFA232JIAAAABdFJOUwBA5thmAAADOUlEQVR42u3bQXLCQBSA4c9/d8gBQXKBEa5AnXv0/29AEEj20sDsfm0rAAAAAADgC4Xn9drPa55A2Z/XfK75hR8AAMAfGk5QsoToitQf/f6g7g8EAAAA/BdhA8QGEJvFbv/m9QTm5QIAAAAAgGlhAcQGEBsAANBkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkqwBiA4gNAADg5d4FiA0gNoAAgHawAUQGEBsAANCkq';
 
 // Define a reusable schema for structured JSON output to improve reliability
 const sectionsSchema = {
@@ -237,7 +237,78 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         </div>
     `;
 
-    // DEFINISI 6 FILE WAJIB YANG DIMINTA
+    // --- LOGIKA HITUNGAN SOAL YANG KETAT (STRICT COUNTING LOGIC) ---
+    const showPesantrenDynamicForm = formData.jenjang === 'Pesantren';
+    
+    let breakdownInstruction = "";
+    let grandTotal = 0;
+
+    if (showPesantrenDynamicForm) {
+        breakdownInstruction = (formData.soal_pesantren_sections || []).map(section => 
+            `- Bagian ${section.letter}: ${section.count} soal. Instruksi: "${section.instruction}"`
+        ).join('\n');
+    } else {
+        // Kalkulasi Jumlah PG
+        const isPgSelected = formData.jenis_soal?.includes('Pilihan Ganda');
+        const pgRegular = isPgSelected ? (Number(formData.jumlah_pg) || 0) : 0;
+        const pgTka = formData.sertakan_soal_tka ? (Number(formData.jumlah_soal_tka) || 0) : 0;
+        const totalPg = pgRegular + pgTka;
+
+        // Kalkulasi Jumlah Uraian
+        const isUraianSelected = formData.jenis_soal?.includes('Uraian');
+        const uraianRegular = isUraianSelected ? (Number(formData.jumlah_uraian) || 0) : 0;
+        const uraianTka = formData.sertakan_soal_tka_uraian ? (Number(formData.jumlah_soal_tka_uraian) || 0) : 0;
+        const totalUraian = uraianRegular + uraianTka;
+
+        // Kalkulasi Jumlah Isian
+        const isIsianSelected = formData.jenis_soal?.includes('Isian Singkat');
+        const totalIsian = isIsianSelected ? (Number(formData.jumlah_isian_singkat) || 0) : 0;
+        
+        grandTotal = totalPg + totalUraian + totalIsian;
+
+        // Bangun string breakdown yang sangat spesifik
+        let parts = [];
+        let currentNumber = 1;
+
+        if (totalPg > 0) {
+            let pgBreakdown = `A. PILIHAN GANDA (Total ${totalPg} Soal)`;
+            pgBreakdown += `\n   - Nomor ${currentNumber} s.d. ${currentNumber + pgRegular - 1}: Soal Mapel ${formData.mata_pelajaran}.`;
+            if (pgTka > 0) {
+                pgBreakdown += `\n   - Nomor ${currentNumber + pgRegular} s.d. ${currentNumber + totalPg - 1}: Soal TKA (Tes Kemampuan Akademik) - Kelompok ${formData.kelompok_tka}.`;
+            }
+            parts.push(pgBreakdown);
+            currentNumber += totalPg;
+        }
+
+        if (totalUraian > 0) {
+            let uraianBreakdown = `B. URAIAN (Total ${totalUraian} Soal)`;
+            uraianBreakdown += `\n   - Nomor ${currentNumber} s.d. ${currentNumber + uraianRegular - 1}: Soal Mapel ${formData.mata_pelajaran}.`;
+             if (uraianTka > 0) {
+                uraianBreakdown += `\n   - Nomor ${currentNumber + uraianRegular} s.d. ${currentNumber + totalUraian - 1}: Soal TKA Uraian - Kelompok ${formData.kelompok_tka}.`;
+            }
+            parts.push(uraianBreakdown);
+            currentNumber += totalUraian;
+        }
+
+        if (totalIsian > 0) {
+             let isianBreakdown = `C. ISIAN SINGKAT (Total ${totalIsian} Soal)`;
+             isianBreakdown += `\n   - Nomor ${currentNumber} s.d. ${currentNumber + totalIsian - 1}: Soal Isian Singkat Mapel ${formData.mata_pelajaran}.`;
+             parts.push(isianBreakdown);
+        }
+
+        breakdownInstruction = parts.join('\n\n');
+    }
+
+    const strictCountPrompt = `
+    **STRUKTUR DAN JUMLAH SOAL YANG WAJIB DIBUAT (DILARANG MENYIMPANG):**
+    
+    ${breakdownInstruction}
+    
+    TOTAL KESELURUHAN: ${showPesantrenDynamicForm ? 'Sesuai bagian di atas' : grandTotal + ' Butir Soal'}.
+    Pastikan penomoran berlanjut antar bagian (jangan mulai dari 1 lagi di bagian B/C kecuali diperintahkan lain).
+    `;
+
+    // DEFINISI 6 FILE WAJIB
     const sectionsToGenerate = [
         { id: "naskah_soal", title: "1. Bank Soal (Naskah Ujian)" },
         { id: "kunci_jawaban", title: "2. Kunci Jawaban & Pembahasan" },
@@ -251,13 +322,13 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         let description = '';
         switch (section.id) {
             case 'naskah_soal':
-                description = 'Buat Naskah Soal lengkap sesuai struktur yang diminta (Header + Soal). Gunakan format HTML yang rapi.';
+                description = `Buat Naskah Soal lengkap. IKUTI STRUKTUR JUMLAH SOAL DI ATAS DENGAN TEPAT. Gabungkan soal Mapel dan TKA dalam satu bagian jika jenisnya sama (misal PG digabung, Uraian digabung).`;
                 break;
             case 'kunci_jawaban':
-                description = 'Berikan kunci jawaban untuk SEMUA soal. Yang terpenting, SERTAKAN PEMBAHASAN/PENJELASAN yang detail untuk SETIAP SOAL.';
+                description = `Berikan kunci jawaban untuk SEMUA SOAL (sesuai jumlah di atas). Sertakan PEMBAHASAN DETAIL.`;
                 break;
             case 'kisi_kisi':
-                description = 'Buat tabel kisi-kisi soal lengkap: No, CP, Materi, Indikator Soal, Level Kognitif (C1-C6), Bentuk Soal, No Soal.';
+                description = `Buat tabel kisi-kisi untuk SEMUA SOAL (sesuai jumlah dan nomor di atas). Kolom: No, CP, Materi, Indikator, Level Kognitif, Bentuk Soal.`;
                 break;
             case 'rubrik_penilaian':
                 description = 'Buat rubrik penilaian/penskoran detail. Skor PG dan Rubrik analitik untuk Uraian.';
@@ -272,74 +343,8 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         return `DOKUMEN ${index + 1}: **${section.title}**\nInstruksi: ${description}`;
     }).join('\n\n');
     
-    // --- START OF QUESTION COUNT LOGIC (REVISED FOR STRICTNESS) ---
-    const showPesantrenDynamicForm = (formData: FormData): boolean => {
-        return formData.jenjang === 'Pesantren';
-    };
-
-    let soalStructurePrompt = "";
-    let grandTotal = 0;
-
-    if (showPesantrenDynamicForm(formData)) {
-        soalStructurePrompt = (formData.soal_pesantren_sections || []).map(section => 
-            `- Bagian ${section.letter}: Buat ${section.count} soal sesuai perintah: "${section.instruction}"`
-        ).join('\n');
-    } else {
-        const isPgSelected = formData.jenis_soal?.includes('Pilihan Ganda');
-        const isUraianSelected = formData.jenis_soal?.includes('Uraian');
-        const isIsianSelected = formData.jenis_soal?.includes('Isian Singkat');
-
-        const pgRegular = isPgSelected ? (Number(formData.jumlah_pg) || 0) : 0;
-        const pgTka = formData.sertakan_soal_tka ? (Number(formData.jumlah_soal_tka) || 0) : 0;
-        const totalPg = pgRegular + pgTka;
-
-        const uraianRegular = isUraianSelected ? (Number(formData.jumlah_uraian) || 0) : 0;
-        const uraianTka = formData.sertakan_soal_tka_uraian ? (Number(formData.jumlah_soal_tka_uraian) || 0) : 0;
-        const totalUraian = uraianRegular + uraianTka;
-
-        const totalIsian = isIsianSelected ? (Number(formData.jumlah_isian_singkat) || 0) : 0;
-        
-        grandTotal = totalPg + totalUraian + totalIsian;
-
-        let instructions = [];
-
-        if (totalPg > 0) {
-            let detail = `Buat total **${totalPg}** butir soal Pilihan Ganda`;
-            let subDetail = [];
-            if (pgRegular > 0) subDetail.push(`${pgRegular} soal materi pelajaran biasa`);
-            if (pgTka > 0) subDetail.push(`${pgTka} soal Tes Potensi Akademik (TKA) kelompok ${formData.kelompok_tka}`);
-            
-            if (subDetail.length > 0) {
-                detail += ` (Terdiri dari: ${subDetail.join(' + ')}).`;
-            }
-            detail += ` **PENTING: Gabungkan semuanya dalam SATU BAGIAN "A. Pilihan Ganda". Penomoran soal harus berurutan dari 1 sampai ${totalPg}. Jangan mulai dari 1 lagi untuk soal TKA.**`;
-            instructions.push(detail);
-        }
-
-        if (totalUraian > 0) {
-            let detail = `Buat total **${totalUraian}** butir soal Uraian`;
-            let subDetail = [];
-            if (uraianRegular > 0) subDetail.push(`${uraianRegular} soal materi pelajaran biasa`);
-            if (uraianTka > 0) subDetail.push(`${uraianTka} soal TKA Uraian kelompok ${formData.kelompok_tka}`);
-            
-            if (subDetail.length > 0) {
-                detail += ` (Terdiri dari: ${subDetail.join(' + ')}).`;
-            }
-            detail += ` **PENTING: Gabungkan semuanya dalam SATU BAGIAN "B. Uraian". Penomoran soal harus berurutan dari 1 sampai ${totalUraian}.**`;
-            instructions.push(detail);
-        }
-
-        if (totalIsian > 0) {
-            instructions.push(`Buat ${totalIsian} soal Isian Singkat pada bagian "C. Isian Singkat".`);
-        }
-
-        soalStructurePrompt = instructions.join('\n\n');
-    }
-    
-    // --- END OF QUESTION COUNT LOGIC ---
-
     const insyaInstruction = formData.mata_pelajaran.toUpperCase() === 'INSYA'
-        ? `**Instruksi Khusus Mapel Insya':** Fokus soal adalah pada **penerapan** kaidah Nahwu/Sharaf (Qawaid) dalam membuat kalimat atau menjawab pertanyaan, BUKAN menguji teori. Contoh: Soal "Jim" meminta siswa menyusun kata menjadi kalimat sempurna yang menuntut penerapan i'rab, atau soal "Ba" yang jawabannya memerlukan penggunaan struktur kalimat tertentu.`
+        ? `**Instruksi Khusus Mapel Insya':** Fokus soal adalah pada **penerapan** kaidah Nahwu/Sharaf (Qawaid) dalam membuat kalimat atau menjawab pertanyaan, BUKAN menguji teori.`
         : '';
     
     const harakatInstruction = formData.bahasa === 'Bahasa Arab' 
@@ -357,10 +362,7 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
         - Tingkat Kesulitan: ${formData.tingkat_kesulitan}
         - Bahasa: ${formData.bahasa}
         
-        **INSTRUKSI JUMLAH SOAL (WAJIB DIPATUHI):**
-        ${!showPesantrenDynamicForm(formData) ? `**TOTAL KESELURUHAN SOAL HARUS ADA: ${grandTotal} SOAL.**\nJika anda membuat kurang dari jumlah ini, proses gagal.` : ''}
-        
-        ${soalStructurePrompt}
+        ${strictCountPrompt}
         
         ${insyaInstruction}
         
@@ -373,14 +375,13 @@ export const generateSoalContentSections = async (formData: FormData): Promise<G
 
         **Aturan Format:**
         - **JANGAN MELEWATKAN SATU BAGIAN PUN.** Pengguna membutuhkan ke-6 file tersebut.
-        - **Aturan Penomoran PENTING:** Gunakan **ANGKA** (1, 2, 3, ...) untuk menomori semua soal. Jangan gunakan huruf. Penomoran harus berurutan.
+        - **Aturan Penomoran PENTING:** Gunakan **ANGKA** (1, 2, 3, ...) untuk menomori semua soal secara berurutan.
         - Root object harus memiliki properti "sections" yang berisi array.
         - Setiap objek section harus memiliki: "id" (string unik: ${sectionsToGenerate.map(s => `"${s.id}"`).join(', ')}), "title" (string), "content" (string HTML).
         - Untuk Naskah Soal, sertakan header ujian yang sudah disediakan di awal kontennya.
-        - Untuk SEMUA DOKUMEN LAINNYA (selain Naskah Soal), sertakan blok tanda tangan guru di akhir kontennya.
-        - Gunakan tag HTML standar. Untuk soal pilihan ganda, gunakan format <ol> untuk penomoran soal dan <ol type='A'> untuk opsi jawaban.
+        - Gunakan tag HTML standar (<ol>, <li>, <table>).
         - **PENTING: Gunakan tanda kutip tunggal (') untuk semua atribut HTML (contoh: <div class='my-class'>) untuk memastikan JSON valid.**
-        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab yang harus menggunakan atribut RTL. Judul bagian dan instruksi Bahasa Indonesia HARUS TETAP LTR.
+        - **Aturan RTL/LTR Penting:** HANYA teks yang berbahasa Arab yang harus menggunakan atribut RTL.
         
         **Header Ujian (untuk Naskah Soal):**
         \`\`\`html
