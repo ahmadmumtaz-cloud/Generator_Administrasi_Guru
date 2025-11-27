@@ -9,7 +9,6 @@ import ResultsDisplay from './components/ResultsDisplay';
 import HistoryList from './components/HistoryList';
 import AIAssistantModal from './components/AIAssistantModal';
 import Notification from './components/Notification';
-import Chatbot from './components/Chatbot';
 import AudioLab from './components/AudioLab';
 import GroundedSearch from './components/GroundedSearch';
 import UserRegistrationModal from './components/UserRegistrationModal';
@@ -611,7 +610,6 @@ const App: React.FC = () => {
       )}
 
       {notification && <Notification message={notification.message} type={notification.type} />}
-      <Chatbot />
       <OnboardingTour isOpen={isTourOpen} onComplete={handleTourComplete} />
     </div>
   );
